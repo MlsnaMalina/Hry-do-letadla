@@ -79,11 +79,6 @@ export const HANGMAN_WORDS: HangmanWord[] = [
   { w: 'SHADOW', h: 'Darkness behind you when light shines' },
 ]
 
-export const OSMI_WORDS = [
-  'AIRPLANE', 'SUITCASE', 'JOURNEY', 'TICKET', 'TRAIN',
-  'BEACH', 'OCEAN', 'HOTEL', 'CITY', 'PILOT',
-]
-
 // Extended offline dictionary for Word Chain
 export const WORDCHAIN_OK = new Set([
   // A

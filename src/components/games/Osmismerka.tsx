@@ -1,7 +1,7 @@
 import { useState, useRef, useMemo } from 'react'
 import { GameShell, ResultsModal, RulesSheet } from '../shell/GameShell'
 import { RoughFrame } from '../primitives/RoughFrame'
-import { OSMI_WORDS } from '../../data/words'
+import { pickOsmiWords } from '../../data/dict'
 import type { GameDef } from '../../data/games'
 
 const G = 10, CELL = 30, GAP = 3
@@ -37,7 +37,7 @@ interface Props { game: GameDef; turnStyle?: string; onBack: () => void; onBestU
 
 export function Osmismerka({ game, turnStyle, onBack, onBestUpdate }: Props) {
   const [seed, setSeed] = useState(0)
-  const {grid, placements} = useMemo(()=>osmiGenerate(OSMI_WORDS), [seed])
+  const {grid, placements} = useMemo(()=>osmiGenerate(pickOsmiWords(10)), [seed])
   const [found, setFound] = useState<FoundWord[]>([])
   const [sel, setSel] = useState<{r:number;c:number}[]>([])
   const [startTime] = useState(()=>Date.now())
