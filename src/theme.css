@@ -1,0 +1,140 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap");
+
+:root, [data-theme="dark"] {
+  --bg:            #0A0E17;
+  --bg-elevated:   #121A28;
+  --card-bg:       rgba(255,255,255,0.055);
+  --card-solid:    #141C2B;
+  --text:          #EAF1FB;
+  --text-muted:    rgba(234,241,251,0.56);
+  --border:        rgba(255,255,255,0.13);
+  --border-strong: rgba(255,255,255,0.22);
+
+  --accent:        #34E4C4;
+  --accent-hover:  #6FF4DD;
+  --accent-tint-soft:   rgba(52,228,196,0.10);
+  --accent-tint-medium: rgba(52,228,196,0.18);
+  --accent-tint-strong: rgba(52,228,196,0.30);
+
+  --p1: #34E4C4;
+  --p2: #FF2E6E;
+
+  --glass-shadow: 0 12px 38px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.09);
+  --device-body:  linear-gradient(160deg, #2A3344, #10151F 60%);
+  --atmo:
+    radial-gradient(130% 85% at 10% -8%, rgba(52,228,196,0.16), transparent 52%),
+    radial-gradient(120% 80% at 98% 108%, rgba(167,139,250,0.18), transparent 52%),
+    radial-gradient(90% 60% at 50% 50%, rgba(56,189,248,0.05), transparent 70%);
+}
+
+[data-theme="light"] {
+  --bg:            #E9EDF4;
+  --bg-elevated:   #FFFFFF;
+  --card-bg:       rgba(255,255,255,0.74);
+  --card-solid:    #FFFFFF;
+  --text:          #0D1422;
+  --text-muted:    rgba(13,20,34,0.56);
+  --border:        rgba(13,20,34,0.11);
+  --border-strong: rgba(13,20,34,0.20);
+
+  --accent:        #0EAE99;
+  --accent-hover:  #12C9B0;
+  --accent-tint-soft:   rgba(14,174,153,0.10);
+  --accent-tint-medium: rgba(14,174,153,0.17);
+  --accent-tint-strong: rgba(14,174,153,0.26);
+
+  --p1: #0EAE99;
+  --p2: #E5106A;
+
+  --glass-shadow: 0 12px 30px rgba(13,20,34,0.13), inset 0 1px 0 rgba(255,255,255,0.7);
+  --device-body:  linear-gradient(160deg, #DFE4EC, #C3CAD6 70%);
+  --atmo:
+    radial-gradient(130% 85% at 10% -8%, rgba(14,174,153,0.12), transparent 52%),
+    radial-gradient(120% 80% at 98% 108%, rgba(167,139,250,0.14), transparent 52%),
+    radial-gradient(90% 60% at 50% 50%, rgba(56,189,248,0.06), transparent 70%);
+}
+
+:root {
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body:    "Manrope", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  --ease-out:   cubic-bezier(0.22, 0.7, 0.3, 1);
+  --ease-pop:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 26px; --r-pill: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { width: 100%; height: 100%; }
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  background: #05070c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+button { font-family: inherit; }
+input { font-family: inherit; }
+
+/* ── App shell ── */
+.app-shell {
+  width: 100%;
+  max-width: 430px;
+  height: 100dvh;
+  max-height: 900px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--atmo), var(--bg);
+  color: var(--text);
+}
+
+/* ── Animations ── */
+@keyframes pop-in {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+@keyframes drop-in {
+  from { transform: translateY(-280px); }
+  to   { transform: translateY(0); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes turn-dot-blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pop-in   { animation: pop-in   .32s var(--ease-pop) both; }
+  .drop-in  { animation: drop-in  .30s var(--ease-pop) both; }
+  .shake    { animation: shake    .35s var(--ease-out) both; }
+  .pulse    { animation: pulse    .70s ease-in-out infinite; }
+  .sheet-up { animation: sheet-up .30s var(--ease-out) both; }
+  .turn-dot { animation: turn-dot-blink 1s step-end infinite; }
+}
+
+/* ── Hover helpers ── */
+@media (hover: hover) {
+  .lift:hover { transform: translateY(-4px); transition: transform .2s var(--ease-out); }
+  .card-hover:hover { box-shadow: var(--glass-shadow), 0 0 0 1.5px var(--accent); }
+}
+
+.ttt-cell:hover { background: var(--accent-tint-soft) !important; }
