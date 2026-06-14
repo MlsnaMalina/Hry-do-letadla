@@ -7,26 +7,58 @@ const ROUND_SECS = 90
 
 // Czech nouns — normalized (uppercase, no diacritics)
 const CZ_WORDS = new Set([
+  // 3-letter nouns
   'PES','LES','NOS','KOS','LOS','ROK','TOK','BOD','LED','MED','ROD','SAD',
   'DUB','LUK','MAK','RAK','LEV','BOL','KOL','VAL','KAL','BOR','BOK','KOP',
   'COP','SOK','PUK','TUK','SUK','BUK','DEN','SEN','SOL','VAZ','LEM','PAN',
-  'TUR','BAL','VAN','SEN','KOR','KUR','LOB','DOB','KOB','SOB','LOD','MOD',
+  'TUR','BAL','VAN','HAD','SYN','NOC','HRA','NIT','LOV','MIR','VIR','DAR',
+  'VUL','ZUB','OKO','MIC','VEZ','MUZ','KRK','LAK','PAR','ZAK','CAJ','VLK',
+  'CAP','LOD','CAS','GOL','GEN','CIN','SUL','KUN','DUM','LOB','HRB','NUZ',
+  'TES','OBS','PIS','TAL','MAS',
+  // 4-letter nouns
   'AUTO','KOLO','DRAK','HRAD','VLAK','MRAK','MOST','DUCH','HORA','NEBE',
   'POLE','MAPA','NOTA','PLAZ','LIST','KOST','HOST','PLES','SLON','BRAT',
   'VLAS','HLAS','DRES','RYBA','NOHA','RUKA','VODA','KOZA','BOTA','SKLO',
   'KREV','SLOH','PRAK','TRAK','VLNA','ROLE','NORA','KOTA','LATA','PLOT',
   'TVOR','LANO','PERO','PIVO','SENO','MENU','VINO','PRSA','TRON','DATA',
   'KRAL','STUL','LAMA','RANA','HLUK','TVAR','OBAL','BRAK','KLAN','PLAN',
-  'HVAT','SLAK','KLUK','SOBA','BLON','KRON','PERO','RENO','SOVA','NOVA',
+  'KLUK','SOVA','OKNO','DVUR','KMEN','SLZA','ZADA','USTA','UCHO','KVET',
+  'REKA','MORE','BROD','MASO','JARO','LETO','ZIMA','RANO','MLHA','ROSA',
+  'MRAZ','SNEH','DEST','KAVA','CUKR','OLEJ','PTAK','OVCE','JELEN',
+  'BOBR','OSEL','SOUD','PARK','GOLF','UHEL','PRST','PLOD','TETA','OTEC',
+  'ZEME','KRAJ','CENA','PLAT','VLAD','STAV','SMYK','CHUT','DLAN','BLAN',
+  'UZOL','UZEL','VRCH','KOPEC','PEPA','JAMO','JAMA','NATA','PATA','PENA',
+  'SLEP','RUKA','NOHA','HORA','LANO','SKLA','MLAD','STUD','VRAK','KRAB',
+  'NOBA','KRES','SKAM','PLAT','BLAT','SVET','VLAK','TRAM','BUSA','TAXI',
+  // 5-letter nouns
   'KAMEN','HLAVA','KNIHA','SALON','BARON','BETON','OPERA','BANDA','LAMPA',
   'KAPSA','VLAST','STROM','PANDA','METAL','HOTEL','MOTOR','PILOT','BALON',
   'POKER','ROMAN','KORAL','PEDAL','TONER','RADAR','NAROD','NORMA','SKALA',
   'TENOR','TRAKT','TRUBA','VRBA','KRASA','BRADA','KABEL','KABAT','TALIR',
   'SOLAR','NYLON','PYLON','DEMON','BONUS','KOSAR','PLECH','TREST','POLKA',
-  'BALKON','KOLONA','KLOKAN','KOSMOS','BANKET','KORUNA','KARTON','LANTYN',
+  'SKOLA','MESTO','ULICE','BANKA','POSTA','SPORT','PISEN','TANEC','HUDBA',
+  'SLOVO','DIVKA','STRYC','SESTRA','LEKAR','DOKTOR','TRIDA','ZNAMKA',
+  'UCITEL','LOUKA','KOCOUR','MEDVED','VEVERKA','JEZEK','SLEPICE','KACHNA',
+  'ZELVA','MLEKO','JIDLO','POLEVKA','KYTARA','BUBEN','PRAVO','ZAKON',
+  'VLADA','VALKA','STRANA','VOJAK','VECER','TYDEN','HODINA','MINUTA',
+  'CHVILE','PODZIM','SRDCE','MOZEK','KOLENO','RAMENO','FOTBAL','HOKEJ',
+  'TENIS','JAZYK','BARVA','NADRAZI','LETISTE','VESNICE','ZAHRADA','OBCHOD',
+  'LEKARNA','STUDENT','MATKA','HOLKA','DITE','VEJCE','CHLEB','VRANA',
+  'HOLUB','OREL','PRASE','KRAVA','LISKA','ZAJIC','TYGR','VLK','KOCKA',
+  'MYSKA','POLAK','PLACH','SABLA','KOTEL','LAVOR','KOSIK','KUFR','KABIN',
+  'TABOR','TRPAS','KASNA','NOMEN','POSLA','SOSED','PLAST','TRAKT','TRAMP',
+  'KLIMA','PRIMA','TRASA','PASTA','PLAZA','KABARET','TABOR','LETUN','JELEN',
+  // 6-letter nouns
+  'BALKON','KOLONA','KLOKAN','KOSMOS','BANKET','KORUNA','KARTON',
+  'JEZERO','NEMOCNICE','STUDENT','KYTARA','VEVERKA','SLEPICE','KACHNA',
+  'KOCOUR','ZAHRADA','LETISTE','NADRAZI','LEKARNA','OBCHOD','VESNICE',
+  'HODINA','MINUTA','PODZIM','KOLENO','RAMENO','MOZEK','SRDCE',
+  'FOTBAL','HOKEJ','TANEC','HUDBA','BUBEN',
+  // 7+ letter nouns
+  'NEMOCNICE','ZAHRADA','LETISTE',
 ])
 
-// English nouns
+// English nouns — common nouns for word-finding
 const EN_WORDS = new Set([
   'ACE','AGE','AID','AIR','APE','ARC','ARM','ART','ASH',
   'BAR','BAT','BAY','BED','BEE','BOW','BOX','BUD','BUG','BUS',
@@ -54,7 +86,7 @@ const EN_WORDS = new Set([
   'BEEF','BEER','BELL','BELT','BIRD','BOAT','BODY','BOMB','BOND','BONE','BOOK','BOOM',
   'BOOT','BOSS','BOWL','BUCK','BULL','BUMP','BUNK','BUST',
   'CAGE','CAKE','CALF','CAMP','CANE','CARD','CARP','CART','CASE','CASH','CAVE','CELL',
-  'CENT','CLAY','CLOD','CLUE','COAL','COAT','CODE','COIL','COIN','COLT','COMB','CONE',
+  'CENT','CLAY','CLUE','COAL','COAT','CODE','COIL','COIN','COLT','COMB','CONE',
   'CORD','CORE','CORK','CORN','COST','CRAB','CREW','CROP','CROW','CUBE','CURL',
   'DAME','DARE','DART','DASH','DATE','DAWN','DEAL','DEAN','DEBT','DECK','DEER','DENT',
   'DESK','DIAL','DIET','DIME','DIRT','DISK','DOCK','DOME','DOSE','DOVE','DOWN','DROP',
@@ -93,7 +125,7 @@ const EN_WORDS = new Set([
   'WADE','WAGE','WAIL','WAKE','WALK','WALL','WANE','WARD','WARE','WART','WAVE','WELL',
   'WELT','WICK','WIFE','WIND','WINE','WING','WIRE','WOLF','WOMB','WORD','WORM','WREN',
   'YARD','YEAR','YOLK','ZEAL','ZONE',
-  // 5+ letter nouns
+  // 5-letter nouns
   'ANGEL','ANKLE','APPLE','ARROW','ATLAS',
   'BRIDE','BROOK','BROTH',
   'CABLE','CAMEL','CANAL','CARGO','CEDAR','CHALK','CHEST','CHINA','CRANE','CREEK',
@@ -118,7 +150,7 @@ const EN_WORDS = new Set([
   'QUAIL','QUEST',
   'RADAR','RADIO','RANCH','RANGE','RAPID','RATIO','RAVEN','REALM','REBEL','RELIC',
   'RIDER','RIDGE','RIFLE','RIVET','ROBOT','ROUND','ROUTE','RULER',
-  'SAINT','SAUCE','SCALE','SCENE','SCONE','SCOUT','SEDAN','SENSE','SERUM','SHARK',
+  'SAINT','SAUCE','SCALE','SCENE','SCOUT','SEDAN','SENSE','SERUM','SHARK',
   'SHELF','SHELL','SIGHT','SIREN','SKILL','SKULL','SKUNK','SLEEP','SLICE','SLOPE',
   'SLOTH','SMELL','SMOKE','SNAKE','SOLAR','SPACE','SPADE','SPARK','SPEAR','SPELL',
   'SPIRE','SPORT','STAIR','STAMP','STAND','STEAK','STEAM','STEEL','STONE','STORE',
@@ -136,7 +168,7 @@ function norm(s: string): string {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z]/g, '')
 }
 
-// Can this word be formed from the pool? Each letter in the word costs one from pool.
+// Can this word be formed from the letter pool?
 function canForm(word: string, pool: string[]): boolean {
   const n = norm(word)
   if (n.length < 2) return false
@@ -153,10 +185,10 @@ function isInDict(word: string, lang: 'cs' | 'en'): boolean {
   return (lang === 'cs' ? CZ_WORDS : EN_WORDS).has(norm(word))
 }
 
-// Generate 11 letters with roughly 4 vowels
+// Generate 11 letters with ~4 vowels
 function genLetters(lang: 'cs' | 'en'): string[] {
   const CZ = 'AAAABBCCDDDEEEEEFFGGHHIIIIJKKKLLLMMNNNNNOOOOPPPRRRSSSTTTTTUUUUVVZZ'
-  const EN = 'AAAAAABBCCDDDEEEEEEFFGGGHHIIIIIIJKKLLLLLMMNNNNOOOOOOOPPPRRRRSSSSTTTTTTUUUUVVWWYYZ'
+  const EN = 'AAAAAABBCCDDDEEEEEEFFFGGHHIIIIIIJKKLLLLLMMNNNNOOOOOOOPPPRRRRSSSSTTTTTTUUUUVVWWYZ'
   const src = (lang === 'cs' ? CZ : EN).split('')
   const chosen: string[] = []
   while (chosen.length < 11 && src.length > 0) {
@@ -166,7 +198,7 @@ function genLetters(lang: 'cs' | 'en'): string[] {
   return chosen
 }
 
-// Find all dictionary words formable from pool (for AI)
+// Find all dictionary words the AI can form from this pool
 function findAiWords(pool: string[], lang: 'cs' | 'en'): string[] {
   const dict = lang === 'cs' ? CZ_WORDS : EN_WORDS
   const result: string[] = []
@@ -175,14 +207,12 @@ function findAiWords(pool: string[], lang: 'cs' | 'en'): string[] {
 }
 
 interface Props { game: GameDef; mode: GameMode; turnStyle?: string; onBack: () => void; onBestUpdate?: (v: string) => void }
-
 type Phase = 'play' | 'handover' | 'results'
 
 export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   const [lang, setLang] = useState<'cs' | 'en'>('cs')
   const [letters, setLetters] = useState<string[]>(() => genLetters('cs'))
   const [input, setInput] = useState('')
-  // p0Words = human (both modes) | p1Words = AI or PvP Player 2
   const [p0Words, setP0Words] = useState<string[]>([])
   const [p1Words, setP1Words] = useState<string[]>([])
   const [pvpTurn, setPvpTurn] = useState<0 | 1>(0)
@@ -193,7 +223,6 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
   const [scores, setScores] = useState([0, 0])
   const [inputError, setInputError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  // Stable ref for endRound so timer effect can call it without stale closure
   const p0Ref = useRef<string[]>([])
   const p1Ref = useRef<string[]>([])
   p0Ref.current = p0Words
@@ -222,39 +251,47 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     onBestUpdate?.(`${Math.max(s0, s1)} slov`)
   }, [evaluate, onBestUpdate])
 
-  // Countdown timer
+  // Countdown
   useEffect(() => {
     if (phase !== 'play' || paused) return
     if (time <= 0) {
-      if (mode === 'pvp' && pvpTurn === 0) {
-        setPhase('handover')
-      } else {
-        endRound()
-      }
+      if (mode === 'pvp' && pvpTurn === 0) setPhase('handover')
+      else endRound()
       return
     }
     const id = setInterval(() => setTime(t => t - 1), 1000)
     return () => clearInterval(id)
   }, [phase, paused, time, mode, pvpTurn, endRound])
 
-  // AI gradually submits words in background
+  // AI plays in background
   useEffect(() => {
     if (mode !== 'ai' || phase !== 'play') return
     const possible = findAiWords(letters, lang)
-    // AI submits 4–9 words, not immediately
     const target = 4 + Math.floor(Math.random() * 6)
     const toSubmit = possible.slice(0, target)
     const timeouts: ReturnType<typeof setTimeout>[] = []
-    let delay = 4000 + Math.random() * 6000
+    let delay = 5000 + Math.random() * 8000
     for (const word of toSubmit) {
       const d = delay
       timeouts.push(setTimeout(() => {
         setP1Words(w => w.includes(word) ? w : [...w, word])
       }, d))
-      delay += 6000 + Math.random() * 12000
+      delay += 7000 + Math.random() * 12000
     }
     return () => timeouts.forEach(clearTimeout)
-  }, [letters, lang, mode]) // only recompute when new game starts
+  }, [letters, lang, mode])
+
+  // Compute which letter tiles are consumed by current input
+  const normInput = norm(input)
+  const inputLetterCounts: Record<string, number> = {}
+  for (const ch of normInput) inputLetterCounts[ch] = (inputLetterCounts[ch] || 0) + 1
+  const tileConsumed = (() => {
+    const counts: Record<string, number> = {}
+    return letters.map(l => {
+      counts[l] = (counts[l] || 0) + 1
+      return counts[l] - 1 < (inputLetterCounts[l] || 0)
+    })
+  })()
 
   const submit = () => {
     const raw = input.trim()
@@ -279,31 +316,26 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     const nl = genLetters(newLang)
     setLetters(nl)
     setP0Words([]); setP1Words([])
-    setTime(ROUND_SECS)
-    setPhase('play')
-    setPvpTurn(0)
-    setPaused(false)
-    setInput('')
-    setScores([0, 0])
+    setTime(ROUND_SECS); setPhase('play')
+    setPvpTurn(0); setPaused(false); setInput(''); setScores([0, 0])
   }
 
   const changeLang = (l: 'cs' | 'en') => { setLang(l); restart(l) }
-
   const timerColor = time <= 10 ? 'var(--accent-hover)' : 'var(--accent)'
   const currentWords = pvpTurn === 0 ? p0Words : p1Words
   const { hUniq, oUniq, shared, hValid, oValid } = phase === 'results'
     ? evaluate(p0Words, p1Words)
-    : { hUniq: [], oUniq: [], shared: [], hValid: [], oValid: [] }
+    : { hUniq: [] as string[], oUniq: [] as string[], shared: [] as string[], hValid: [] as string[], oValid: [] as string[] }
   const winnerIdx = hUniq.length > oUniq.length ? 0 : hUniq.length < oUniq.length ? 1 : -1
 
-  // Handover screen (PvP between P1 and P2)
+  // PvP handover screen
   if (phase === 'handover') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: 24, padding: 32, background: 'var(--bg)' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 30, color: 'var(--text)' }}>Hráč 1 hotov!</div>
           <div style={{ color: 'var(--text-muted)', marginTop: 8, fontSize: 14 }}>
-            Hráč 1 zadal {p0Words.length} slov. Předejte zařízení Hráči 2 — jeho slova budou skrytá.
+            Zadal {p0Words.length} slov. Předejte zařízení Hráči 2 — jeho slova budou skrytá.
           </div>
         </div>
         <button onClick={() => { setTime(ROUND_SECS); setPhase('play'); setPvpTurn(1) }} style={{
@@ -318,16 +350,15 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     )
   }
 
-  // Results overlay content
-  const WordChip = ({ word, status }: { word: string; status: 'uniq' | 'shared' | 'invalid' }) => {
-    const bg = status === 'uniq' ? 'var(--accent-tint-medium)' : status === 'shared' ? 'var(--card-bg)' : 'rgba(255,0,0,0.1)'
-    const col = status === 'uniq' ? 'var(--accent)' : status === 'shared' ? 'var(--text-muted)' : '#ff6b6b'
-    return (
-      <span style={{ padding: '4px 10px', borderRadius: 999, background: bg, color: col, fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12, textDecoration: status === 'invalid' ? 'line-through' : 'none' }}>
-        {word}
-      </span>
-    )
-  }
+  const WordChip = ({ word, status }: { word: string; status: 'uniq' | 'shared' | 'invalid' }) => (
+    <span style={{
+      padding: '4px 10px', borderRadius: 999,
+      background: status === 'uniq' ? 'var(--accent-tint-medium)' : status === 'shared' ? 'var(--card-bg)' : 'rgba(255,80,80,0.12)',
+      color: status === 'uniq' ? 'var(--accent)' : status === 'shared' ? 'var(--text-muted)' : '#ff6b6b',
+      fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12,
+      textDecoration: status === 'invalid' ? 'line-through' : 'none',
+    }}>{word}</span>
+  )
 
   return (
     <GameShell players={players} active={mode === 'pvp' ? pvpTurn : 0}
@@ -336,7 +367,7 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
       turnStyle={turnStyle ?? 'pills'} onBack={onBack} onRestart={() => restart()}
       onPause={() => setPaused(p => !p)} paused={paused} onRules={() => setRules(true)}>
 
-      {/* Language + timer row */}
+      {/* Language + timer */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', marginBottom: 10 }}>
         {(['cs', 'en'] as const).map(l => (
           <button key={l} onClick={() => changeLang(l)} style={{
@@ -351,8 +382,7 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
           <span style={{
             fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 28, lineHeight: 1,
             color: timerColor, fontVariantNumeric: 'tabular-nums',
-            textShadow: `0 0 12px ${timerColor}`,
-            transition: 'color .3s',
+            textShadow: `0 0 12px ${timerColor}`, transition: 'color .3s',
             animation: time <= 10 && !paused ? 'pulse .7s ease-in-out infinite' : 'none',
           }}>{time}</span>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)' }}>s</span>
@@ -360,25 +390,31 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
       </div>
 
       {/* Letter tiles */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, justifyContent: 'center', marginBottom: 10, width: '100%' }}>
-        {letters.map((l, i) => (
-          <button key={i} onClick={() => setInput(inp => inp + l)} style={{
-            width: 38, height: 42, borderRadius: 10, border: 'none', cursor: 'pointer',
-            background: 'var(--card-solid)',
-            color: 'var(--text)',
-            fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19,
-            boxShadow: 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.14)',
-            flexShrink: 0,
-          }}>{l}</button>
-        ))}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, justifyContent: 'center', marginBottom: 8, width: '100%' }}>
+        {letters.map((l, i) => {
+          const consumed = tileConsumed[i]
+          return (
+            <button key={i} onClick={() => { if (!consumed) setInput(inp => inp + l) }} style={{
+              width: 38, height: 42, borderRadius: 10, border: 'none',
+              cursor: consumed ? 'default' : 'pointer',
+              background: consumed ? 'var(--card-bg)' : 'var(--card-solid)',
+              color: consumed ? 'var(--text-muted)' : 'var(--text)',
+              fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19,
+              boxShadow: consumed ? 'none' : 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.14)',
+              opacity: consumed ? 0.35 : 1,
+              transition: 'opacity .12s, background .12s',
+              flexShrink: 0,
+            }}>{l}</button>
+          )
+        })}
       </div>
 
       {/* Input row */}
-      <div style={{ display: 'flex', gap: 8, width: '100%', marginBottom: 10 }}>
+      <div style={{ display: 'flex', gap: 6, width: '100%', marginBottom: 10 }}>
         <input
           ref={inputRef}
           value={input}
-          onChange={e => setInput(e.target.value.toUpperCase().replace(/[^A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/gi, ''))}
+          onChange={e => setInput(norm(e.target.value))}
           onKeyDown={e => e.key === 'Enter' && submit()}
           placeholder={lang === 'cs' ? 'Napiš podstatné jméno…' : 'Type a noun…'}
           autoCapitalize="characters"
@@ -390,8 +426,13 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
             outline: 'none', transition: 'border-color .15s',
           }}
         />
+        <button onClick={() => setInput(i => i.slice(0, -1))} style={{
+          width: 44, height: 44, borderRadius: 12, border: 'none', cursor: 'pointer',
+          background: 'var(--card-solid)', color: 'var(--text)', fontSize: 18,
+          boxShadow: 'var(--glass-shadow)',
+        }}>⌫</button>
         <button onClick={submit} style={{
-          padding: '0 20px', borderRadius: 12, border: 'none', cursor: 'pointer',
+          padding: '0 18px', height: 44, borderRadius: 12, border: 'none', cursor: 'pointer',
           background: 'var(--accent)', color: '#06120F',
           fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14,
           boxShadow: '0 0 14px var(--accent-tint-strong)',
@@ -401,8 +442,8 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
       {/* Word chips */}
       <div style={{ flex: 1, overflowY: 'auto', width: '100%', minHeight: 0 }}>
         {currentWords.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '12px 0' }}>
-            {lang === 'cs' ? 'Zadej podstatná jména ze zásobníku výše' : 'Enter nouns using the letters above'}
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '8px 0' }}>
+            {lang === 'cs' ? 'Zadej podstatná jména složená z písmen výše' : 'Enter nouns using the letters above'}
           </div>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -433,44 +474,22 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                 {hUniq.length} : {oUniq.length} unikátních slov
               </div>
             </div>
-
-            {/* P0 words */}
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: players[0].color, marginBottom: 6, textTransform: 'uppercase' }}>
-                {players[0].name} — {hUniq.length} unik.
+            {[{ label: players[0].name, color: players[0].color, valid: hValid, all: p0Words, uniq: hUniq }, { label: players[1].name, color: players[1].color, valid: oValid, all: p1Words, uniq: oUniq }].map(({ label, color, valid, all, uniq }) => (
+              <div key={label} style={{ marginBottom: 12 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color, marginBottom: 6, textTransform: 'uppercase' }}>
+                  {label} — {uniq.length} unik.
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {valid.map(w => <WordChip key={w} word={w} status={shared.includes(w) ? 'shared' : 'uniq'} />)}
+                  {all.filter(w => !valid.includes(w)).map(w => <WordChip key={w} word={w} status="invalid" />)}
+                  {all.length === 0 && <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>žádná slova</span>}
+                </div>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                {hValid.map(w => <WordChip key={w} word={w} status={shared.includes(w) ? 'shared' : 'uniq'} />)}
-                {p0Words.filter(w => !hValid.includes(w)).map(w => <WordChip key={w} word={w} status="invalid" />)}
-                {p0Words.length === 0 && <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>žádná slova</span>}
-              </div>
-            </div>
-
-            {/* P1 / AI words */}
-            <div style={{ marginBottom: 18 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: players[1].color, marginBottom: 6, textTransform: 'uppercase' }}>
-                {players[1].name} — {oUniq.length} unik.
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                {oValid.map(w => <WordChip key={w} word={w} status={shared.includes(w) ? 'shared' : 'uniq'} />)}
-                {p1Words.filter(w => !oValid.includes(w)).map(w => <WordChip key={w} word={w} status="invalid" />)}
-                {p1Words.length === 0 && <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>žádná slova</span>}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button onClick={() => restart()} style={{
-                padding: '14px', border: 'none', background: 'var(--accent)', color: '#06120F',
-                fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15,
-                cursor: 'pointer', borderRadius: 14, boxShadow: '0 0 22px var(--accent-tint-strong)',
-              }}>Hrát znovu</button>
-              <button onClick={onBack} style={{
-                position: 'relative', padding: '12px', border: 'none', background: 'transparent',
-                color: 'var(--text)', fontFamily: 'var(--font-body)', fontWeight: 600,
-                fontSize: 14, cursor: 'pointer', borderRadius: 14,
-              }}>
-                <RoughFrame stroke="var(--border-strong)" strokeWidth={1} radius={14} />
-                Zpět do herny
+            ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 }}>
+              <button onClick={() => restart()} style={{ padding: '14px', border: 'none', background: 'var(--accent)', color: '#06120F', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15, cursor: 'pointer', borderRadius: 14, boxShadow: '0 0 22px var(--accent-tint-strong)' }}>Hrát znovu</button>
+              <button onClick={onBack} style={{ position: 'relative', padding: '12px', border: 'none', background: 'transparent', color: 'var(--text)', fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, cursor: 'pointer', borderRadius: 14 }}>
+                <RoughFrame stroke="var(--border-strong)" strokeWidth={1} radius={14} />Zpět do herny
               </button>
             </div>
           </div>

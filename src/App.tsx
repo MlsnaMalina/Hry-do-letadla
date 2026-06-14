@@ -9,6 +9,7 @@ import { Hangman } from './components/games/Hangman'
 import { WordChain } from './components/games/WordChain'
 import { Osmismerka } from './components/games/Osmismerka'
 import { Slovnik } from './components/games/Slovnik'
+import { Had } from './components/games/Had'
 
 type Screen = GameId | null
 
@@ -34,6 +35,7 @@ function GameView({ id, mode, onBack, onBestUpdate }: { id: GameId; mode: GameMo
       {id === 'wordchain'  && <WordChain  {...props} />}
       {id === 'osmismerka' && <Osmismerka {...props} />}
       {id === 'slovnik'    && <Slovnik    {...props} />}
+      {id === 'had'        && <Had        {...props} />}
     </div>
   )
 }
