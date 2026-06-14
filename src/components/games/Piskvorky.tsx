@@ -62,7 +62,7 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
   const [board, setBoard] = useState(empty)
   const [active, setActive] = useState(0)
   const [scores, setScores] = useState([0, 0])
-  const [winner, setWinner] = useState<number | null>(null)
+  const [winner, setWinner] = useState<number | 'draw' | null>(null)
   const [winCells, setWinCells] = useState<number[]>([])
   const [paused, setPaused] = useState(false)
   const [rules, setRules] = useState(false)
@@ -78,6 +78,8 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
       if ('vibrate' in navigator) navigator.vibrate([14, 60, 14])
       setWinner(active); setWinCells(w)
       setScores(s => { const n = s.slice(); n[active]++; onBestUpdate?.(`${n[0]} výher`); return n })
+    } else if (b.every(c => c != null)) {
+      setWinner('draw')
     } else setActive(a => 1 - a)
   }
 
@@ -93,6 +95,7 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
           const w = check(b, i, 1)
           setBoard(b)
           if (w) { setWinner(1); setWinCells(w); setScores(s => { const n = s.slice(); n[1]++; return n }) }
+          else if (b.every(c => c != null)) setWinner('draw')
           else setActive(0)
         }
 
@@ -106,8 +109,10 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
           const b = board.slice(); b[i] = 0
           if (check(b, i, 0)) { doPlace(i); return }
         }
-        // 3. 30% of the time play a reasonable random move (keeps AI beatable)
-        if (Math.random() < 0.30) {
+        // 3. Random move chance decreases as player wins (progressive difficulty)
+        // 0 wins→45%, 1→37%, 2→29%, 3→18%, 4+→8% random
+        const randomChance = Math.max(0.08, 0.45 - scores[0] * 0.08)
+        if (Math.random() < randomChance) {
           const occ = board.map((v, i) => v != null ? i : -1).filter(i => i >= 0)
           if (occ.length > 0) {
             const adj = new Set<number>()
@@ -136,12 +141,14 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
 
   const restart = () => { setBoard(empty()); setActive(0); setWinner(null); setWinCells([]); setPaused(false) }
 
-  const winTitle = winner === 0
-    ? (mode === 'ai' ? 'Vyhráváš!' : 'Vyhrává Hráč 1!')
+  const winTitle = winner === 'draw' ? 'Remíza!'
+    : winner === 0 ? (mode === 'ai' ? 'Vyhráváš!' : 'Vyhrává Hráč 1!')
     : (mode === 'ai' ? 'Vyhrává AI' : 'Vyhrává protihráč!')
+  const winLine = winner === 'draw' ? 'Plná deska, nikdo nedal pět v řadě.'
+    : 'Pět v řadě — krásná série.'
 
   return (
-    <GameShell players={players} active={active} winner={winner}
+    <GameShell players={players} active={active} winner={typeof winner === 'number' ? winner : null}
       scores={[{ value: scores[0], color: players[0].color }, { value: scores[1], color: players[1].color }]}
       turnStyle={turnStyle} onBack={onBack} onRestart={restart} onPause={() => setPaused(p => !p)} paused={paused} onRules={() => setRules(true)}>
       <div style={{ position: 'relative', padding: 10, borderRadius: 16, background: 'linear-gradient(165deg, color-mix(in srgb, var(--accent) 10%, var(--card-solid)), var(--card-solid))', boxShadow: 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.12)' }}>
@@ -159,8 +166,7 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
         </div>
       </div>
       <ResultsModal open={winner != null} sub={mode === 'ai' ? 'Hra proti AI' : 'Pass & play'}
-        title={winTitle}
-        line="Pět v řadě — krásná série." onAgain={restart} onHub={onBack} />
+        title={winTitle} line={winLine} onAgain={restart} onHub={onBack} />
       <RulesSheet open={rules} tag={game.tag} rules={game.rules} onClose={() => setRules(false)} />
     </GameShell>
   )

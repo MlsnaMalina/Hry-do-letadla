@@ -6,10 +6,19 @@ import type { GameDef, GameMode } from '../../data/games'
 
 const START = 7
 
+// Diverse starting words — varied last letters so each game starts differently
+const STARTERS = [
+  'BRAVE','CLEAN','WATER','SPORT','BLOOM','GRACE','GLOBE','DREAM',
+  'STONE','PLANE','FLAME','CLOUD','FROST','PROUD','CRANE','BLEND',
+  'TOWER','TRACK','BREAD','STERN','OCEAN','PLAIN','STORM','CHAIR',
+  'NORTH','LIGHT','CRAFT','CHEST','BRUSH','DANCE','MUSIC','NOVEL',
+]
+const pickStarter = () => STARTERS[Math.floor(Math.random() * STARTERS.length)]
+
 interface Props { game: GameDef; mode: GameMode; turnStyle?: string; onBack: () => void; onBestUpdate?: (v: string) => void }
 
 export function WordChain({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
-  const [chain, setChain] = useState<string[]>(['TRAVEL'])
+  const [chain, setChain] = useState<string[]>(() => [pickStarter()])
   const [time, setTime] = useState(START)
   const [active, setActive] = useState(0)
   const [over, setOver] = useState(false)
@@ -55,7 +64,7 @@ export function WordChain({ game, mode, turnStyle, onBack, onBestUpdate }: Props
   }
 
   const flash = (m: string) => { setErr(m); setTimeout(() => setErr(''), 1200) }
-  const restart = () => { setChain(['TRAVEL']); setTime(START); setActive(0); setOver(false); setPaused(false); setVal(''); setErr(''); setTimeout(() => inputRef.current?.focus(), 30) }
+  const restart = () => { setChain([pickStarter()]); setTime(START); setActive(0); setOver(false); setPaused(false); setVal(''); setErr(''); setTimeout(() => inputRef.current?.focus(), 30) }
 
   return (
     <GameShell players={players} active={active} winner={undefined}

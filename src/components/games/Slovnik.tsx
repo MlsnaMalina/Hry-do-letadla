@@ -7,15 +7,22 @@ const ROUND_SECS = 90
 
 // Czech nouns — normalized (uppercase, no diacritics)
 const CZ_WORDS = new Set([
-  // 3-letter nouns
+  // 2-letter
+  'PO','LO','DO',
+  // 3-letter
   'PES','LES','NOS','KOS','LOS','ROK','TOK','BOD','LED','MED','ROD','SAD',
   'DUB','LUK','MAK','RAK','LEV','BOL','KOL','VAL','KAL','BOR','BOK','KOP',
   'COP','SOK','PUK','TUK','SUK','BUK','DEN','SEN','SOL','VAZ','LEM','PAN',
   'TUR','BAL','VAN','HAD','SYN','NOC','HRA','NIT','LOV','MIR','VIR','DAR',
   'VUL','ZUB','OKO','MIC','VEZ','MUZ','KRK','LAK','PAR','ZAK','CAJ','VLK',
   'CAP','LOD','CAS','GOL','GEN','CIN','SUL','KUN','DUM','LOB','HRB','NUZ',
-  'TES','OBS','PIS','TAL','MAS',
-  // 4-letter nouns
+  'TES','PIS','TAL','MAS',
+  'PAS','BOJ','TAH','VRH','ZIP','KRB','BRK','ZAL','VAR','TAP','KAP','TRN',
+  'SUP','LUP','MOP','TOP','SUM','KAZ','RAZ','BAS','RYL','CUK','BEH','SEK',
+  'TAK','NAL','HOK','REP','CUR','MAZ','ZAR','LAP','PAP','CUP','COK','ROH',
+  'SOH','BEC','KEC','TEC','VEC','SEC','REC','LEC','NEC','BEC',
+  'HRB','PEL','SON','TON','BON','MON','ZON','POL','MOL','DOL','ROL','FOL',
+  // 4-letter
   'AUTO','KOLO','DRAK','HRAD','VLAK','MRAK','MOST','DUCH','HORA','NEBE',
   'POLE','MAPA','NOTA','PLAZ','LIST','KOST','HOST','PLES','SLON','BRAT',
   'VLAS','HLAS','DRES','RYBA','NOHA','RUKA','VODA','KOZA','BOTA','SKLO',
@@ -26,36 +33,55 @@ const CZ_WORDS = new Set([
   'REKA','MORE','BROD','MASO','JARO','LETO','ZIMA','RANO','MLHA','ROSA',
   'MRAZ','SNEH','DEST','KAVA','CUKR','OLEJ','PTAK','OVCE','JELEN',
   'BOBR','OSEL','SOUD','PARK','GOLF','UHEL','PRST','PLOD','TETA','OTEC',
-  'ZEME','KRAJ','CENA','PLAT','VLAD','STAV','SMYK','CHUT','DLAN','BLAN',
-  'UZOL','UZEL','VRCH','KOPEC','PEPA','JAMO','JAMA','NATA','PATA','PENA',
-  'SLEP','RUKA','NOHA','HORA','LANO','SKLA','MLAD','STUD','VRAK','KRAB',
-  'NOBA','KRES','SKAM','PLAT','BLAT','SVET','VLAK','TRAM','BUSA','TAXI',
-  // 5-letter nouns
+  'ZEME','KRAJ','CENA','PLAT','STAV','CHUT','DLAN',
+  'JAMA','PATA','PENA','BLAT','SVET','TRAM','TAXI',
+  'ZRAK','PUSA','KUNA','KOSA','MISA','OSUD','GRIL','STAN','DECH','VLEC',
+  'VLEK','HROB','BLOK','KLAM','RUCH','TISK','TLAK','VRAH','ZISK','RISK',
+  'DISK','FILM','KLUB','TEST','PRUH','SRUB','PUCH','KOST','RIAD',
+  'STEH','SLEH','VEST','TROP','DRAP','OCKO','BLAN','VRCH','UZEL','VRAK',
+  'KRAB','SMYK','VLAD','SKAM','STUD','KRES','BUSA','MLAD','SKLA','UZOL',
+  'SLEP','KOPEC','NOBA','NATA','PEPA','JAMO','KOTA',
+  'SKOK','TROK','TROS','STON','KLON','BLON','TLON','KROG','LNOG',
+  'PERO','HORA','NOHA','RUKA','LANO','PLAT','VLAK',
+  'CHOV','CHOD','CHOP','CHOM','CHOR',
+  'OHON','OHEN','OCEL','OCET','OPAD',
+  'UVAL','UZAS','URAZ','ULET','UTEK','UTOK',
+  'VRBA','VRCH','VRAK','VRES','VLAK',
+  'ZDAR','ZDIH','ZPEV','ZROD','ZVON','ZVOR',
+  // 5-letter
   'KAMEN','HLAVA','KNIHA','SALON','BARON','BETON','OPERA','BANDA','LAMPA',
   'KAPSA','VLAST','STROM','PANDA','METAL','HOTEL','MOTOR','PILOT','BALON',
   'POKER','ROMAN','KORAL','PEDAL','TONER','RADAR','NAROD','NORMA','SKALA',
   'TENOR','TRAKT','TRUBA','VRBA','KRASA','BRADA','KABEL','KABAT','TALIR',
   'SOLAR','NYLON','PYLON','DEMON','BONUS','KOSAR','PLECH','TREST','POLKA',
   'SKOLA','MESTO','ULICE','BANKA','POSTA','SPORT','PISEN','TANEC','HUDBA',
-  'SLOVO','DIVKA','STRYC','SESTRA','LEKAR','DOKTOR','TRIDA','ZNAMKA',
-  'UCITEL','LOUKA','KOCOUR','MEDVED','VEVERKA','JEZEK','SLEPICE','KACHNA',
-  'ZELVA','MLEKO','JIDLO','POLEVKA','KYTARA','BUBEN','PRAVO','ZAKON',
+  'SLOVO','DIVKA','STRYC','LEKAR','TRIDA','ZNAMKA','LOUKA',
+  'ZELVA','MLEKO','JIDLO','KYTARA','BUBEN','PRAVO','ZAKON',
   'VLADA','VALKA','STRANA','VOJAK','VECER','TYDEN','HODINA','MINUTA',
   'CHVILE','PODZIM','SRDCE','MOZEK','KOLENO','RAMENO','FOTBAL','HOKEJ',
-  'TENIS','JAZYK','BARVA','NADRAZI','LETISTE','VESNICE','ZAHRADA','OBCHOD',
-  'LEKARNA','STUDENT','MATKA','HOLKA','DITE','VEJCE','CHLEB','VRANA',
-  'HOLUB','OREL','PRASE','KRAVA','LISKA','ZAJIC','TYGR','VLK','KOCKA',
-  'MYSKA','POLAK','PLACH','SABLA','KOTEL','LAVOR','KOSIK','KUFR','KABIN',
-  'TABOR','TRPAS','KASNA','NOMEN','POSLA','SOSED','PLAST','TRAKT','TRAMP',
-  'KLIMA','PRIMA','TRASA','PASTA','PLAZA','KABARET','TABOR','LETUN','JELEN',
-  // 6-letter nouns
+  'TENIS','JAZYK','BARVA','OBCHOD',
+  'MATKA','HOLKA','DITE','VEJCE','CHLEB','VRANA',
+  'HOLUB','OREL','PRASE','KRAVA','LISKA','ZAJIC','TYGR','KOCKA',
+  'MYSKA','KOTEL','LAVOR','KOSIK','KUFR','TRASA','PASTA',
+  'KLIMA','TABOR','BLATO','OKRAJ','DOPIS','OBLAK','OHLAS',
+  'OSADA','KUPKA','POLKA','PALEC','SRDCE','PENCE',
+  'BREZA','JASAN','TRAVA','JETEL','KAPKA','ISKRA','VLHKO',
+  'OBLEK','KABAT','ZIMAK','SUKNE','PONOZ','RUKAV',
+  'CESTA','SILNA','DOLNI','HORNI',
+  'PISEK','PRACH','KAMAK','BAHNO','HLINA','ZEMNA',
+  'VODKA','LIKUR','SIRUP','DZHEM','DROBY','KOKAL',
+  'OPONA','MASKA','SOCHA','OLTARI','OBRAZ',
+  'ZAMEK','BRANA','DVERE','SKLEP','KOMIN','STROP','PODLA',
+  'LAVKA','MOSTA','KAMEN','SKALA','UDOLI',
+  // 6-letter
   'BALKON','KOLONA','KLOKAN','KOSMOS','BANKET','KORUNA','KARTON',
-  'JEZERO','NEMOCNICE','STUDENT','KYTARA','VEVERKA','SLEPICE','KACHNA',
-  'KOCOUR','ZAHRADA','LETISTE','NADRAZI','LEKARNA','OBCHOD','VESNICE',
-  'HODINA','MINUTA','PODZIM','KOLENO','RAMENO','MOZEK','SRDCE',
-  'FOTBAL','HOKEJ','TANEC','HUDBA','BUBEN',
-  // 7+ letter nouns
-  'NEMOCNICE','ZAHRADA','LETISTE',
+  'JEZERO','KOCOUR','MEDVED','VEVERKA','JEZEK','SLEPICE','KACHNA',
+  'ZAHRADA','LETISTE','NADRAZI','LEKARNA','VESNICE',
+  'NOZDRA','STUDENT','POLEVKA','DOKTOR','SESTRA','UCITEL','ZNAMKA',
+  'STRAKA','LASICE','TCHOUH','BOBCAT',
+  'KABARET','LETADLO','KUFRIK',
+  // 7+
+  'NEMOCNICE','KABARET','SLEPICE','VEVERKA',
 ])
 
 // English nouns — common nouns for word-finding
@@ -163,9 +189,11 @@ const EN_WORDS = new Set([
   'YACHT','YIELD',
 ])
 
-// Normalize: strip diacritics, uppercase, letters only
+// Normalize: strip combining diacritics (U+0300–U+036F), uppercase, letters only
 function norm(s: string): string {
-  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z]/g, '')
+  return [...s.normalize('NFD')]
+    .filter(c => { const cc = c.charCodeAt(0); return cc < 0x0300 || cc > 0x036f })
+    .join('').toUpperCase().replace(/[^A-Z]/g, '')
 }
 
 // Can this word be formed from the letter pool?
