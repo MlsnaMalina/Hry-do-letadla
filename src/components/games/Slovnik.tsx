@@ -5,10 +5,8 @@ import type { GameDef, GameMode } from '../../data/games'
 
 const ROUND_SECS = 90
 
-// Czech nouns — normalized (uppercase, no diacritics)
+// Czech nouns — normalized (uppercase, no diacritics), verified first-case singular only
 const CZ_WORDS = new Set([
-  // 2-letter
-  'PO','LO','DO',
   // 3-letter
   'PES','LES','NOS','KOS','LOS','ROK','TOK','BOD','LED','MED','ROD','SAD',
   'DUB','LUK','MAK','RAK','LEV','BOL','KOL','VAL','KAL','BOR','BOK','KOP',
@@ -16,12 +14,8 @@ const CZ_WORDS = new Set([
   'TUR','BAL','VAN','HAD','SYN','NOC','HRA','NIT','LOV','MIR','VIR','DAR',
   'VUL','ZUB','OKO','MIC','VEZ','MUZ','KRK','LAK','PAR','ZAK','CAJ','VLK',
   'CAP','LOD','CAS','GOL','GEN','CIN','SUL','KUN','DUM','LOB','HRB','NUZ',
-  'TES','PIS','TAL','MAS',
-  'PAS','BOJ','TAH','VRH','ZIP','KRB','BRK','ZAL','VAR','TAP','KAP','TRN',
-  'SUP','LUP','MOP','TOP','SUM','KAZ','RAZ','BAS','RYL','CUK','BEH','SEK',
-  'TAK','NAL','HOK','REP','CUR','MAZ','ZAR','LAP','PAP','CUP','COK','ROH',
-  'SOH','BEC','KEC','TEC','VEC','SEC','REC','LEC','NEC','BEC',
-  'HRB','PEL','SON','TON','BON','MON','ZON','POL','MOL','DOL','ROL','FOL',
+  'TES','PAS','BOJ','TAH','VRH','ZIP','KRB','BRK','ZAL','VAR','KAZ','RAZ',
+  'BAS','TRN','SUP','LUP','MOP','TOP','SUM','ROH','BEH','SEK','MOL','VEC',
   // 4-letter
   'AUTO','KOLO','DRAK','HRAD','VLAK','MRAK','MOST','DUCH','HORA','NEBE',
   'POLE','MAPA','NOTA','PLAZ','LIST','KOST','HOST','PLES','SLON','BRAT',
@@ -31,57 +25,42 @@ const CZ_WORDS = new Set([
   'KRAL','STUL','LAMA','RANA','HLUK','TVAR','OBAL','BRAK','KLAN','PLAN',
   'KLUK','SOVA','OKNO','DVUR','KMEN','SLZA','ZADA','USTA','UCHO','KVET',
   'REKA','MORE','BROD','MASO','JARO','LETO','ZIMA','RANO','MLHA','ROSA',
-  'MRAZ','SNEH','DEST','KAVA','CUKR','OLEJ','PTAK','OVCE','JELEN',
+  'MRAZ','SNEH','DEST','KAVA','CUKR','OLEJ','PTAK','OVCE','OREL','TYGR',
   'BOBR','OSEL','SOUD','PARK','GOLF','UHEL','PRST','PLOD','TETA','OTEC',
-  'ZEME','KRAJ','CENA','PLAT','STAV','CHUT','DLAN',
-  'JAMA','PATA','PENA','BLAT','SVET','TRAM','TAXI',
-  'ZRAK','PUSA','KUNA','KOSA','MISA','OSUD','GRIL','STAN','DECH','VLEC',
-  'VLEK','HROB','BLOK','KLAM','RUCH','TISK','TLAK','VRAH','ZISK','RISK',
-  'DISK','FILM','KLUB','TEST','PRUH','SRUB','PUCH','KOST','RIAD',
-  'STEH','SLEH','VEST','TROP','DRAP','OCKO','BLAN','VRCH','UZEL','VRAK',
-  'KRAB','SMYK','VLAD','SKAM','STUD','KRES','BUSA','MLAD','SKLA','UZOL',
-  'SLEP','KOPEC','NOBA','NATA','PEPA','JAMO','KOTA',
-  'SKOK','TROK','TROS','STON','KLON','BLON','TLON','KROG','LNOG',
-  'PERO','HORA','NOHA','RUKA','LANO','PLAT','VLAK',
-  'CHOV','CHOD','CHOP','CHOM','CHOR',
-  'OHON','OHEN','OCEL','OCET','OPAD',
-  'UVAL','UZAS','URAZ','ULET','UTEK','UTOK',
-  'VRBA','VRCH','VRAK','VRES','VLAK',
-  'ZDAR','ZDIH','ZPEV','ZROD','ZVON','ZVOR',
+  'ZEME','KRAJ','CENA','PLAT','STAV','CHUT','DLAN','JAMA','PATA','PENA',
+  'SVET','TRAM','TAXI','KUFR','VLEC','DZEM',
+  'ZRAK','PUSA','KUNA','KOSA','MISA','OSUD','GRIL','STAN','DECH','VLEK',
+  'HROB','BLOK','KLAM','RUCH','TISK','TLAK','VRAH','ZISK','DISK','FILM',
+  'KLUB','TEST','PRUH','SRUB','PUCH','STEH','DRAP','OCKO','VRCH','UZEL',
+  'VRAK','KRAB','SMYK','STUD','KRES','SKOK','KLON','CHOV','CHOD','CHOR',
+  'OHEN','OCEL','OCET','OPAD','UZAS','URAZ','UTEK','UTOK',
+  'VRBA','VRES','ZDAR','ZPEV','ZROD','ZVON','RISK',
   // 5-letter
   'KAMEN','HLAVA','KNIHA','SALON','BARON','BETON','OPERA','BANDA','LAMPA',
   'KAPSA','VLAST','STROM','PANDA','METAL','HOTEL','MOTOR','PILOT','BALON',
-  'POKER','ROMAN','KORAL','PEDAL','TONER','RADAR','NAROD','NORMA','SKALA',
-  'TENOR','TRAKT','TRUBA','VRBA','KRASA','BRADA','KABEL','KABAT','TALIR',
+  'POKER','ROMAN','KORAL','PEDAL','RADAR','NAROD','NORMA','SKALA',
+  'TENOR','TRAKT','TRUBA','KRASA','BRADA','KABEL','KABAT','TALIR',
   'SOLAR','NYLON','PYLON','DEMON','BONUS','KOSAR','PLECH','TREST','POLKA',
   'SKOLA','MESTO','ULICE','BANKA','POSTA','SPORT','PISEN','TANEC','HUDBA',
-  'SLOVO','DIVKA','STRYC','LEKAR','TRIDA','ZNAMKA','LOUKA',
-  'ZELVA','MLEKO','JIDLO','KYTARA','BUBEN','PRAVO','ZAKON',
-  'VLADA','VALKA','STRANA','VOJAK','VECER','TYDEN','HODINA','MINUTA',
-  'CHVILE','PODZIM','SRDCE','MOZEK','KOLENO','RAMENO','FOTBAL','HOKEJ',
-  'TENIS','JAZYK','BARVA','OBCHOD',
-  'MATKA','HOLKA','DITE','VEJCE','CHLEB','VRANA',
-  'HOLUB','OREL','PRASE','KRAVA','LISKA','ZAJIC','TYGR','KOCKA',
-  'MYSKA','KOTEL','LAVOR','KOSIK','KUFR','TRASA','PASTA',
-  'KLIMA','TABOR','BLATO','OKRAJ','DOPIS','OBLAK','OHLAS',
-  'OSADA','KUPKA','POLKA','PALEC','SRDCE','PENCE',
-  'BREZA','JASAN','TRAVA','JETEL','KAPKA','ISKRA','VLHKO',
-  'OBLEK','KABAT','ZIMAK','SUKNE','PONOZ','RUKAV',
-  'CESTA','SILNA','DOLNI','HORNI',
-  'PISEK','PRACH','KAMAK','BAHNO','HLINA','ZEMNA',
-  'VODKA','LIKUR','SIRUP','DZHEM','DROBY','KOKAL',
-  'OPONA','MASKA','SOCHA','OLTARI','OBRAZ',
-  'ZAMEK','BRANA','DVERE','SKLEP','KOMIN','STROP','PODLA',
-  'LAVKA','MOSTA','KAMEN','SKALA','UDOLI',
+  'SLOVO','DIVKA','STRYC','LEKAR','TRIDA','LOUKA','ZELVA','MLEKO','JIDLO',
+  'BUBEN','PRAVO','ZAKON','VLADA','VALKA','VOJAK','VECER','TYDEN',
+  'JAZYK','BARVA','MATKA','HOLKA','DITE','VEJCE','CHLEB','VRANA',
+  'HOLUB','PRASE','KRAVA','LISKA','ZAJIC','KOCKA','MYSKA',
+  'KOTEL','LAVOR','KOSIK','TRASA','PASTA','KLIMA','TABOR',
+  'BLATO','OKRAJ','DOPIS','OBLAK','OHLAS','OSADA','KUPKA','PALEC',
+  'BREZA','JASAN','TRAVA','JETEL','KAPKA','VLHKO','OBLEK','SUKNE','RUKAV',
+  'CESTA','PISEK','PRACH','BAHNO','HLINA','VODKA','SIRUP','DROBY','LIKER',
+  'OPONA','MASKA','SOCHA','OLTAR','OBRAZ','ZAMEK','BRANA','DVERE',
+  'SKLEP','KOMIN','STROP','LAVKA','UDOLI','JELEN','KOPEC','ZIMAK',
+  'MOZEK','SRDCE','HOKEJ','TENIS','JEZEK','HRNEK','SKRIN','KOLAC','GULAS',
   // 6-letter
   'BALKON','KOLONA','KLOKAN','KOSMOS','BANKET','KORUNA','KARTON',
-  'JEZERO','KOCOUR','MEDVED','VEVERKA','JEZEK','SLEPICE','KACHNA',
-  'ZAHRADA','LETISTE','NADRAZI','LEKARNA','VESNICE',
-  'NOZDRA','STUDENT','POLEVKA','DOKTOR','SESTRA','UCITEL','ZNAMKA',
-  'STRAKA','LASICE','TCHOUH','BOBCAT',
-  'KABARET','LETADLO','KUFRIK',
+  'JEZERO','KOCOUR','MEDVED','KACHNA','NOZDRA','DOKTOR','SESTRA',
+  'UCITEL','ZNAMKA','STRAKA','LASICE','KUFRIK','STRANA','OBCHOD',
+  'FOTBAL','KOLENO','RAMENO','HODINA','MINUTA','PODZIM','KYTARA',
   // 7+
-  'NEMOCNICE','KABARET','SLEPICE','VEVERKA',
+  'NEMOCNICE','ZAHRADA','LETISTE','NADRAZI','LEKARNA','VESNICE',
+  'STUDENT','POLEVKA','KABARET','LETADLO','SLEPICE','VEVERKA',
 ])
 
 // English nouns — common nouns for word-finding
@@ -200,6 +179,21 @@ function addCustomWord(word: string, lang: 'cs' | 'en') {
   try { localStorage.setItem(`ta-custom-${lang}`, JSON.stringify([...customWords[lang]])) } catch {}
 }
 
+// Banned words — words the user has removed from the effective dictionary
+const loadBanned = (lang: 'cs' | 'en'): Set<string> => {
+  try { return new Set(JSON.parse(localStorage.getItem(`ta-banned-${lang}`) ?? '[]')) } catch { return new Set() }
+}
+const bannedWords = { cs: loadBanned('cs'), en: loadBanned('en') }
+
+function banWord(word: string, lang: 'cs' | 'en') {
+  bannedWords[lang].add(word)
+  customWords[lang].delete(word)
+  try {
+    localStorage.setItem(`ta-banned-${lang}`, JSON.stringify([...bannedWords[lang]]))
+    localStorage.setItem(`ta-custom-${lang}`, JSON.stringify([...customWords[lang]]))
+  } catch {}
+}
+
 // Normalize: strip combining diacritics (U+0300–U+036F), uppercase, letters only
 function norm(s: string): string {
   return [...s.normalize('NFD')]
@@ -222,6 +216,7 @@ function canForm(word: string, pool: string[]): boolean {
 
 function isInDict(word: string, lang: 'cs' | 'en'): boolean {
   const n = norm(word)
+  if (bannedWords[lang].has(n)) return false
   return (lang === 'cs' ? CZ_WORDS : EN_WORDS).has(n) || customWords[lang].has(n)
 }
 
@@ -391,10 +386,10 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     )
   }
 
-  const WordChip = ({ word, status, onAdd }: { word: string; status: 'uniq' | 'shared' | 'invalid'; onAdd?: () => void }) => (
+  const WordChip = ({ word, status, onAdd, onRemove }: { word: string; status: 'uniq' | 'shared' | 'invalid'; onAdd?: () => void; onRemove?: () => void }) => (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 3,
-      padding: status === 'invalid' ? '4px 5px 4px 10px' : '4px 10px', borderRadius: 999,
+      padding: (status === 'invalid' && onAdd) || onRemove ? '4px 5px 4px 10px' : '4px 10px', borderRadius: 999,
       background: status === 'uniq' ? 'var(--accent-tint-medium)' : status === 'shared' ? 'var(--card-bg)' : 'rgba(255,80,80,0.12)',
       color: status === 'uniq' ? 'var(--accent)' : status === 'shared' ? 'var(--text-muted)' : '#ff6b6b',
       fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12,
@@ -408,6 +403,14 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
           background: 'rgba(255,255,255,0.15)', color: '#ff6b6b', fontSize: 12, fontWeight: 800,
           lineHeight: 1, padding: 0, flexShrink: 0,
         }}>+</button>
+      )}
+      {status !== 'invalid' && onRemove && (
+        <button onClick={onRemove} title="Odebrat ze slovníku" style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 18, height: 18, borderRadius: 999, border: 'none', cursor: 'pointer',
+          background: 'rgba(255,255,255,0.12)', color: 'var(--text-muted)', fontSize: 14, fontWeight: 800,
+          lineHeight: 1, padding: 0, flexShrink: 0,
+        }}>−</button>
       )}
     </span>
   )
@@ -532,7 +535,10 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                   {label} — {uniq.length} unik.
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                  {valid.map(w => <WordChip key={w + dictVersion} word={w} status={shared.includes(w) ? 'shared' : 'uniq'} />)}
+                  {valid.map(w => <WordChip key={w + dictVersion} word={w} status={shared.includes(w) ? 'shared' : 'uniq'} onRemove={() => {
+                    banWord(w, lang)
+                    setDictVersion(v => v + 1)
+                  }} />)}
                   {all.filter(w => !valid.includes(w)).map(w => (
                     <WordChip key={w + dictVersion} word={w} status="invalid" onAdd={() => {
                       addCustomWord(w, lang)
