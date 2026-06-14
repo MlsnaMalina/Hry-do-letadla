@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { GameShell, ResultsModal, RulesSheet, type Player } from '../shell/GameShell'
 import { RoughFrame } from '../primitives/RoughFrame'
 import type { GameDef, GameMode } from '../../data/games'
@@ -52,7 +52,7 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   const [paused, setPaused] = useState(false)
   const [rules, setRules] = useState(false)
   const players = mkPlayers(mode)
-  const placed = dots.reduce((a,d) => a+(d!=null?1:0), 0)
+  const placed = dots.reduce<number>((a,d) => a+(d!=null?1:0), 0)
   const done = placed >= N
   const winner = done ? (scores[0]===scores[1] ? 'draw' : (scores[0]>scores[1] ? 0 : 1)) : null
 

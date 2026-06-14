@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { GameShell, ResultsModal, RulesSheet } from '../shell/GameShell'
 import { RoughFrame } from '../primitives/RoughFrame'
 import { OSMI_WORDS } from '../../data/words'
