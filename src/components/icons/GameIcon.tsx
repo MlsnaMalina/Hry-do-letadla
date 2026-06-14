@@ -24,6 +24,8 @@ export function GameIcon({ name, size = 44 }: Props) {
       return (<svg {...c}><rect x="9" y="26" width="26" height="15" rx="7.5" transform="rotate(-18 22 33)" /><rect x="30" y="24" width="26" height="15" rx="7.5" transform="rotate(-18 43 31)" /><path d="M48 9L45 16M55 13L50 18M56 22L50 23" strokeWidth="2.4" /></svg>)
     case 'osmismerka':
       return (<svg {...c}><rect x="10" y="10" width="44" height="44" rx="7" /><path d="M24 10V54M40 10V54M10 24H54M10 40H54" strokeWidth="2.2" opacity="0.5" /><path d="M15 15L49 49" strokeWidth="3.6" /><circle cx="15" cy="15" r="3" fill="currentColor" stroke="none" /><circle cx="49" cy="49" r="3" fill="currentColor" stroke="none" /></svg>)
+    case 'slovnik':
+      return (<svg {...c}><rect x="12" y="8" width="30" height="38" rx="5" /><path d="M12 16H42M12 24H42M12 32H32" strokeWidth="2.5" opacity="0.6" /><circle cx="46" cy="44" r="10" /><path d="M43 44L45.5 46.5L49.5 41.5" strokeWidth="2.8" /></svg>)
     case 'airplane':
       return (<svg {...c}><path d="M30 8C33 8 34 13 34 20L56 34V40L34 35V49L41 53V57L31 54L21 57V53L28 49V35L6 40V34L28 20C28 13 27 8 30 8Z" /></svg>)
     default: return null

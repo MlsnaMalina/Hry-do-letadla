@@ -1,4 +1,4 @@
-export type GameId = 'piskvorky' | 'tecky' | 'ctyri' | 'hangman' | 'wordchain' | 'osmismerka'
+export type GameId = 'piskvorky' | 'tecky' | 'ctyri' | 'hangman' | 'wordchain' | 'osmismerka' | 'slovnik'
 export type GameMode = 'ai' | 'pvp'
 
 export interface GameDef {
@@ -57,6 +57,17 @@ export const GAMES: GameDef[] = [
     desc: 'Najdi schovaná anglická slovíčka ve všech osmi směrech — i pozpátku a šikmo.',
     bestLabel: 'Nejrychlejší čas', defaultBest: '—',
     rules: ['V mřížce se skrývají anglická cestovatelská slovíčka ze seznamu.', 'Slova jsou ve všech osmi směrech — vodorovně, svisle i šikmo, i pozpátku.', 'Táhni prstem od prvního k poslednímu písmenu slova a najdi je všechna.'],
+  },
+  {
+    id: 'slovnik', icon: 'slovnik', title: 'Slovní hra', accent: '#FB923C',
+    tag: '// kdo najde víc?', en: false, solo: false,
+    desc: 'Sestav co nejvíce slov z 11 náhodných písmen. Čeština nebo angličtina — 90 vteřin.',
+    bestLabel: 'Nejvíc platných slov', defaultBest: '0',
+    rules: [
+      'Oba hráči dostanou 11 stejných písmen a 90 vteřin.',
+      'Pište podstatná jména v prvním pádu (pes, auto, stůl…). Každé písmeno lze v jednom slově použít jen tolikrát, kolikrát se v zásobníku vyskytuje.',
+      'Po uplynutí času se odstraní neplatná slova a duplicity (slova, která zadali oba). Vyhrává ten, kdo má víc unikátních platných slov.',
+    ],
   },
 ]
 

@@ -121,14 +121,19 @@ input { font-family: inherit; }
   0%,100% { opacity: 1; }
   50%      { opacity: 0; }
 }
+@keyframes win-flash {
+  0%,100% { background: var(--accent-tint-strong); }
+  50%      { background: var(--accent-tint-medium); box-shadow: inset 0 0 0 1.5px var(--accent); }
+}
 
 @media (prefers-reduced-motion: no-preference) {
-  .pop-in   { animation: pop-in   .32s var(--ease-pop) both; }
-  .drop-in  { animation: drop-in  .30s var(--ease-pop) both; }
-  .shake    { animation: shake    .35s var(--ease-out) both; }
-  .pulse    { animation: pulse    .70s ease-in-out infinite; }
-  .sheet-up { animation: sheet-up .30s var(--ease-out) both; }
-  .turn-dot { animation: turn-dot-blink 1s step-end infinite; }
+  .pop-in    { animation: pop-in    .32s var(--ease-pop) both; }
+  .drop-in   { animation: drop-in   .30s var(--ease-pop) both; }
+  .shake     { animation: shake     .35s var(--ease-out) both; }
+  .pulse     { animation: pulse     .70s ease-in-out infinite; }
+  .sheet-up  { animation: sheet-up  .30s var(--ease-out) both; }
+  .turn-dot  { animation: turn-dot-blink 1s step-end infinite; }
+  .win-flash { animation: win-flash .45s ease 0s 4; }
 }
 
 /* ── Hover helpers ── */

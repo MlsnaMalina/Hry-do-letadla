@@ -70,10 +70,12 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
 
   const place = (idx: number) => {
     if (board[idx] != null || winner != null || paused) return
+    if ('vibrate' in navigator) navigator.vibrate(8)
     const b = board.slice(); b[idx] = active
     const w = check(b, idx, active)
     setBoard(b)
     if (w) {
+      if ('vibrate' in navigator) navigator.vibrate([14, 60, 14])
       setWinner(active); setWinCells(w)
       setScores(s => { const n = s.slice(); n[active]++; onBestUpdate?.(`${n[0]} výher`); return n })
     } else setActive(a => 1 - a)
@@ -148,7 +150,7 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
           {board.map((v, i) => {
             const isWin = winCells.includes(i), isEmpty = v == null && winner == null
             return (
-              <button key={i} onClick={() => place(i)} className={isEmpty ? 'ttt-cell' : ''}
+              <button key={i} onClick={() => place(i)} className={`${isEmpty ? 'ttt-cell' : ''} ${isWin ? 'win-flash' : ''}`}
                 style={{ width: 30, height: 30, border: '0.5px solid var(--border)', background: isWin ? 'var(--accent-tint-strong)' : 'transparent', display: 'grid', placeItems: 'center', cursor: isEmpty ? 'pointer' : 'default', padding: 0, transition: 'background .15s' }}>
                 {v != null && <Mark kind={v} color={players[v].color} win={isWin} />}
               </button>

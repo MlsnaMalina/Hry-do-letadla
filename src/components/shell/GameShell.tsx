@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { RoughFrame } from '../primitives/RoughFrame'
 import { RoughUnderline } from '../primitives/RoughUnderline'
-import { useState } from 'react'
 
 export interface Player { name: string; mark: string; color: string }
 export interface ScoreEntry { value: number | string; color: string }
@@ -20,29 +19,19 @@ function CtrlIcon({ name }: { name: string }) {
   }
 }
 
-// ── RoundBtn ──────────────────────────────────────────────────────────────
-function RoundBtn({ icon, label, onClick, primary, active }: { icon: string; label: string; onClick: () => void; primary?: boolean; active?: boolean }) {
-  const [h, setH] = useState(false)
-  const on = primary || active
+// ── PillBtn ───────────────────────────────────────────────────────────────
+function PillBtn({ icon, label, onClick, active }: { icon: string; label: string; onClick: () => void; active?: boolean }) {
   return (
-    <button onClick={onClick} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-      aria-label={label} style={{
-        position: 'relative', width: 52, height: 52, minWidth: 44, minHeight: 44, borderRadius: 16,
-        background: on
-          ? 'linear-gradient(160deg, var(--accent-hover), var(--accent))'
-          : 'linear-gradient(160deg, color-mix(in srgb, var(--card-solid) 88%, #fff), var(--card-solid))',
-        boxShadow: on
-          ? '0 0 20px var(--accent-tint-strong), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.22), 0 3px 7px rgba(0,0,0,0.32)'
-          : 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 4px rgba(0,0,0,0.18)',
-        color: on ? '#06120F' : 'var(--text)', border: 'none', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        gap: 1, transition: 'transform .16s ease, box-shadow .16s ease',
-        transform: h ? 'translateY(-2px)' : 'none',
-        fontFamily: 'var(--font-body)',
-      }}>
-      {!on && <RoughFrame stroke="var(--border)" strokeWidth={1} radius={16} />}
+    <button onClick={onClick} aria-label={label} style={{
+      display: 'flex', alignItems: 'center', gap: 7, padding: '0 15px',
+      height: 44, minWidth: 44, borderRadius: 999, border: 'none', cursor: 'pointer',
+      background: active ? 'var(--accent)' : 'transparent',
+      color: active ? '#06120F' : 'var(--text)',
+      fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13,
+      whiteSpace: 'nowrap', transition: 'background .15s, color .15s',
+    }}>
       <CtrlIcon name={icon} />
-      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.02em' }}>{label}</span>
+      {label}
     </button>
   )
 }
@@ -223,11 +212,20 @@ export function GameShell({ players, active, scores, winner, turnStyle = 'pills'
         {children}
       </div>
 
-      {/* bottom controls */}
-      <div style={{ flexShrink: 0, padding: '10px 16px 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, borderTop: '1px solid var(--border)' }}>
-        <RoundBtn icon="restart" label="Restart" onClick={onRestart} />
-        <RoundBtn icon={paused ? 'play' : 'pause'} label={paused ? 'Hrát' : 'Pauza'} onClick={onPause} active={paused} />
-        <RoundBtn icon="rules" label="Pravidla" onClick={onRules} />
+      {/* bottom controls — floating pill bar */}
+      <div style={{ flexShrink: 0, padding: '8px 16px 20px', display: 'flex', justifyContent: 'center' }}>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', padding: '4px', borderRadius: 999,
+          background: 'color-mix(in srgb, var(--card-solid) 96%, #fff)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: '0 4px 28px rgba(0,0,0,0.35), 0 0 0 1px var(--border)',
+        }}>
+          <PillBtn icon="restart" label="Restart" onClick={onRestart} />
+          <div style={{ width: 1, height: 22, background: 'var(--border)', flexShrink: 0, opacity: 0.7 }} />
+          <PillBtn icon={paused ? 'play' : 'pause'} label={paused ? 'Hrát' : 'Pauza'} onClick={onPause} active={paused} />
+          <div style={{ width: 1, height: 22, background: 'var(--border)', flexShrink: 0, opacity: 0.7 }} />
+          <PillBtn icon="rules" label="Pravidla" onClick={onRules} />
+        </div>
       </div>
     </div>
   )

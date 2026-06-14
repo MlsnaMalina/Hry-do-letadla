@@ -55,12 +55,13 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
 
   const placed = dots.reduce<number>((a,d) => a+(d!=null?1:0), 0)
 
-  // Early termination: if leader's score exceeds loser's score + all remaining capturable enemy dots
-  const uncapturedP1 = dots.filter((d,i) => d===1 && cap[i]==null).length
-  const uncapturedP0 = dots.filter((d,i) => d===0 && cap[i]==null).length
-  const earlyOver = placed > 24 && (
-    scores[0] > scores[1] + uncapturedP1 ||
-    scores[1] > scores[0] + uncapturedP0
+  // Early termination: end when score gap exceeds useful cells left for the trailing player.
+  // "Useful for red" = empty cells NOT already inside green (P0) enclosed territory.
+  const usefulForRed  = dots.filter((_,i) => dots[i]==null && terr[i]!==0).length
+  const usefulForGreen = dots.filter((_,i) => dots[i]==null && terr[i]!==1).length
+  const earlyOver = placed > 30 && (
+    scores[0] - scores[1] > usefulForRed  + 2 ||
+    scores[1] - scores[0] > usefulForGreen + 2
   )
   const done = placed >= N || earlyOver
   const winner = done ? (scores[0]===scores[1] ? 'draw' : (scores[0]>scores[1] ? 0 : 1)) : null
@@ -83,15 +84,19 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   useEffect(()=>{
     if(mode==='ai'&&active===1&&!done&&!paused){
       const t=setTimeout(()=>{
-        const empties: number[] = []; for(let i=0;i<N;i++) if(dots[i]==null) empties.push(i)
-        if(!empties.length) return
+        // Skip cells inside P0's (green) territory — placing there is always wasteful
+        const empties: number[] = []
+        for(let i=0;i<N;i++) if(dots[i]==null && terr[i]!==0) empties.push(i)
+        // Fallback: if all remaining cells are in green territory, pick any empty
+        const pool = empties.length > 0 ? empties : Array.from({length:N},(_,i)=>i).filter(i=>dots[i]==null)
+        if(!pool.length) return
         let best: number|null=null, bestG=0
-        for(const i of empties){const nd=dots.slice();nd[i]=1;const r=dotsCapture(nd,cap,1);if(r.gained>bestG){bestG=r.gained;best=i}}
-        place(best!=null?best:empties[Math.floor(Math.random()*empties.length)], 1)
+        for(const i of pool){const nd=dots.slice();nd[i]=1;const r=dotsCapture(nd,cap,1);if(r.gained>bestG){bestG=r.gained;best=i}}
+        place(best!=null?best:pool[Math.floor(Math.random()*pool.length)], 1)
       }, 480)
       return ()=>clearTimeout(t)
     }
-  },[active,mode,done,paused,dots,cap])
+  },[active,mode,done,paused,dots,cap,terr])
 
   const restart = ()=>{setDots(Array(N).fill(null));setCap(Array(N).fill(null));setTerr(Array(N).fill(null));setSegs([]);setScores([0,0]);setActive(0);setPaused(false)}
 

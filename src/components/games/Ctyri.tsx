@@ -39,10 +39,12 @@ export function Ctyri({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
     if(winner!=null||paused) return
     let row=-1; for(let r=ROWS-1;r>=0;r--) if(board[r*COLS+col]==null){row=r;break}
     if(row<0) return
+    if('vibrate' in navigator) navigator.vibrate(8)
     const cellIdx=row*COLS+col; const b=board.slice(); b[cellIdx]=by
     setBoard(b); setDropping(cellIdx); setTimeout(()=>setDropping(null),280)
     const w=check(b,cellIdx,by)
     if(w){
+      if('vibrate' in navigator) navigator.vibrate([14,60,14])
       setWinner(by); setWinCells(w)
       setScores(s=>{const n=s.slice();n[by]++;onBestUpdate?.(`${n[by]} výher`);return n})
     } else if(b.every(c=>c!=null)) setWinner('draw')
