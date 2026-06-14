@@ -39,7 +39,7 @@ export const GAMES: GameDef[] = [
   },
   {
     id: 'hangman', icon: 'hangman', title: 'Hangman', accent: '#38BDF8',
-    tag: '// practice English', en: true, solo: true,
+    tag: '// practice English', en: true, solo: false,
     desc: 'Uhádněte anglické slovo po písmenech. Pět chyb a je konec.',
     bestLabel: 'Slov uhádnuto', defaultBest: '0',
     rules: ['Hádejte písmena anglického slova.', 'Každé chybné písmeno ubere jeden pokus z pěti.', 'Uhádněte celé slovo dřív, než dojdou pokusy.'],

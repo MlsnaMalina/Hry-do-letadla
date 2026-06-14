@@ -52,8 +52,17 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   const [paused, setPaused] = useState(false)
   const [rules, setRules] = useState(false)
   const players = mkPlayers(mode)
+
   const placed = dots.reduce<number>((a,d) => a+(d!=null?1:0), 0)
-  const done = placed >= N
+
+  // Early termination: if leader's score exceeds loser's score + all remaining capturable enemy dots
+  const uncapturedP1 = dots.filter((d,i) => d===1 && cap[i]==null).length
+  const uncapturedP0 = dots.filter((d,i) => d===0 && cap[i]==null).length
+  const earlyOver = placed > 24 && (
+    scores[0] > scores[1] + uncapturedP1 ||
+    scores[1] > scores[0] + uncapturedP0
+  )
+  const done = placed >= N || earlyOver
   const winner = done ? (scores[0]===scores[1] ? 'draw' : (scores[0]>scores[1] ? 0 : 1)) : null
 
   const place = (i: number, by = active) => {
@@ -90,6 +99,10 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   const X=(c:number)=>c*GAP, Y=(r:number)=>r*GAP
   const pcol=(p:number)=>p===0?'var(--p1)':'var(--p2)'
 
+  const winTitle = winner==='draw' ? 'Remíza!'
+    : winner===0 ? (mode==='ai' ? 'Vyhráváš!' : 'Vyhrává Hráč 1!')
+    : (mode==='ai' ? 'Vyhrává AI' : 'Vyhrává protihráč!')
+
   return (
     <GameShell players={players} active={active} winner={typeof winner==='number'?winner:null}
       scores={[{value:scores[0],color:players[0].color},{value:scores[1],color:players[1].color}]}
@@ -112,9 +125,11 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
           {dots.map((v,i)=>{const r=Math.floor(i/C),c=i%C; return <circle key={'h'+i} cx={X(c)} cy={Y(r)} r={GAP/2-1} fill="transparent" style={{cursor:v==null&&!done?'pointer':'default'}} onClick={()=>place(i)}/>})}
         </svg>
       </div>
+      {earlyOver && !done && null}
       <ResultsModal open={done} sub={mode==='ai'?'Hra proti AI':'Pass & play'}
-        title={winner==='draw'?'Remíza!':`${players[winner??0].name} vyhrává!`}
-        line={`Obklíčeno ${scores[0]} : ${scores[1]}`} onAgain={restart} onHub={onBack}/>
+        title={winTitle}
+        line={earlyOver ? `Rozhodnuto! ${scores[0]} : ${scores[1]}` : `Obklíčeno ${scores[0]} : ${scores[1]}`}
+        onAgain={restart} onHub={onBack}/>
       <RulesSheet open={rules} tag={game.tag} rules={game.rules} onClose={()=>setRules(false)}/>
     </GameShell>
   )

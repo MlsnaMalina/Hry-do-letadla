@@ -87,9 +87,16 @@ export function Hub({ theme, onToggleTheme, modes, setMode, onPlay, bestScores }
               onClick={() => onPlay(g, modes[g.id])}
               onKeyDown={e => e.key === 'Enter' && onPlay(g, modes[g.id])}
               className="lift card-hover"
-              style={{ position: 'relative', cursor: 'pointer', borderRadius: 20, padding: 15, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 11, ...glass }}
+              style={{
+                position: 'relative', cursor: 'pointer', borderRadius: 20, padding: 15,
+                display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 11,
+                background: `linear-gradient(150deg, ${hexA(g.accent, 0.18)}, var(--card-solid) 75%)`,
+                backdropFilter: 'blur(16px) saturate(140%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+                boxShadow: `0 8px 24px ${hexA(g.accent, 0.14)}, var(--glass-shadow)`,
+              }}
             >
-              <RoughFrame stroke="var(--border)" strokeWidth={1} radius={20} />
+              <RoughFrame stroke={hexA(g.accent, 0.32)} strokeWidth={1} radius={20} />
               <IconChip icon={g.icon} accent={g.accent} size={48} glyph={28} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 16.5, color: 'var(--text)', lineHeight: 1.05 }}>{g.title}</div>

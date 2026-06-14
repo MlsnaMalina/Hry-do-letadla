@@ -52,8 +52,23 @@ export function Ctyri({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   useEffect(()=>{
     if(mode==='ai'&&active===1&&winner==null&&!paused){
       const t=setTimeout(()=>{
-        const cols=[];for(let c=0;c<COLS;c++) if(board[c]==null) cols.push(c)
-        if(cols.length) drop(cols[Math.floor(Math.random()*cols.length)],1)
+        const validCols: number[]=[]
+        for(let c=0;c<COLS;c++) if(board[c]==null) validCols.push(c)
+        if(!validCols.length) return
+
+        const landRow=(col:number)=>{for(let r=ROWS-1;r>=0;r--) if(board[r*COLS+col]==null) return r; return -1}
+
+        // Win immediately
+        for(const c of validCols){const r=landRow(c);if(r<0)continue;const b=board.slice();b[r*COLS+c]=1;if(check(b,r*COLS+c,1)){drop(c,1);return}}
+        // Block player win
+        for(const c of validCols){const r=landRow(c);if(r<0)continue;const b=board.slice();b[r*COLS+c]=0;if(check(b,r*COLS+c,0)){drop(c,1);return}}
+
+        // Center-biased weighted random (prefer col 3, then 2&4, then 1&5, then 0&6)
+        const w=[1,2,4,7,4,2,1]
+        const total=validCols.reduce((s,c)=>s+w[c],0)
+        let r=Math.random()*total, chosen=validCols[0]
+        for(const c of validCols){r-=w[c];if(r<=0){chosen=c;break}}
+        drop(chosen,1)
       },600)
       return ()=>clearTimeout(t)
     }
@@ -84,7 +99,7 @@ export function Ctyri({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
         </div>
       </div>
       <ResultsModal open={winner!=null} sub={mode==='ai'?'Hra proti AI':'Pass & play'}
-        title={winner==='draw'?'Remíza!':(winner===0||mode!=='ai'?`${players[typeof winner==='number'?winner:0].name} vyhrává!`:'AI vyhrává')}
+        title={winner==='draw'?'Remíza!':winner===0?(mode==='ai'?'Vyhráváš!':'Vyhrává Hráč 1!'):(mode==='ai'?'Vyhrává AI':'Vyhrává protihráč!')}
         line={winner==='draw'?'Plná deska.':'Čtyři v řadě!'} onAgain={restart} onHub={onBack}/>
       <RulesSheet open={rules} tag={game.tag} rules={game.rules} onClose={()=>setRules(false)}/>
     </GameShell>

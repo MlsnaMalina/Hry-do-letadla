@@ -89,7 +89,7 @@ export function WordChain({ game, mode, turnStyle, onBack, onBestUpdate }: Props
         </form>
       </div>
       <ResultsModal open={over} sub="Rapid-fire English"
-        title={mode !== 'ai' ? `${players[1 - active].name} vyhrává!` : 'Čas vypršel'}
+        title={mode !== 'ai' ? (1 - active === 0 ? 'Vyhrává Hráč 1!' : 'Vyhrává protihráč!') : 'Čas vypršel'}
         line={`Řetěz: ${chain.length - 1} slov`}
         onAgain={restart} onHub={onBack} />
       <RulesSheet open={rules} tag={game.tag} rules={game.rules} onClose={() => setRules(false)} />
