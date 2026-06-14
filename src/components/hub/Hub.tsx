@@ -18,13 +18,6 @@ interface Props {
   bestScores: Record<GameId, string>
 }
 
-const glass = {
-  background: 'var(--card-bg)',
-  backdropFilter: 'blur(16px) saturate(140%)',
-  WebkitBackdropFilter: 'blur(16px) saturate(140%)',
-  boxShadow: 'var(--glass-shadow)',
-}
-
 export function Hub({ theme, onToggleTheme, modes, setMode, onPlay, bestScores }: Props) {
   const [hero, ...rest] = GAMES
 
