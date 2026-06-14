@@ -31,6 +31,7 @@ export function Ctyri({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   const [winner, setWinner] = useState<number|'draw'|null>(null)
   const [winCells, setWinCells] = useState<number[]>([])
   const [dropping, setDropping] = useState<number|null>(null)
+  const [showModal, setShowModal] = useState(false)
   const [paused, setPaused] = useState(false)
   const [rules, setRules] = useState(false)
   const players = mkPlayers(mode)
@@ -76,6 +77,13 @@ export function Ctyri({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
     }
   },[active,mode,winner,paused,board])
 
+  useEffect(()=>{
+    if(winner!=null){
+      const t=setTimeout(()=>setShowModal(true), typeof winner==='number'?2000:0)
+      return ()=>clearTimeout(t)
+    } else { setShowModal(false) }
+  },[winner])
+
   const restart = ()=>{setBoard(empty());setActive(0);setWinner(null);setWinCells([]);setPaused(false)}
 
   return (
@@ -100,7 +108,7 @@ export function Ctyri({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
           })}
         </div>
       </div>
-      <ResultsModal open={winner!=null} sub={mode==='ai'?'Hra proti AI':'Pass & play'}
+      <ResultsModal open={showModal} sub={mode==='ai'?'Hra proti AI':'Pass & play'}
         title={winner==='draw'?'Remíza!':winner===0?(mode==='ai'?'Vyhráváš!':'Vyhrává Hráč 1!'):(mode==='ai'?'Vyhrává AI':'Vyhrává protihráč!')}
         line={winner==='draw'?'Plná deska.':'Čtyři v řadě!'} onAgain={restart} onHub={onBack}/>
       <RulesSheet open={rules} tag={game.tag} rules={game.rules} onClose={()=>setRules(false)}/>

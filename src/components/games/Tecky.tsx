@@ -49,6 +49,7 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
   const [segs, setSegs] = useState<[number,number,number][]>([])
   const [scores, setScores] = useState([0,0])
   const [active, setActive] = useState(0)
+  const [showModal, setShowModal] = useState(false)
   const [paused, setPaused] = useState(false)
   const [rules, setRules] = useState(false)
   const players = mkPlayers(mode)
@@ -98,6 +99,14 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
     }
   },[active,mode,done,paused,dots,cap,terr])
 
+  useEffect(()=>{
+    if(done){
+      const t=setTimeout(()=>setShowModal(true), typeof winner==='number'?2000:0)
+      return ()=>clearTimeout(t)
+    } else { setShowModal(false) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[done])
+
   const restart = ()=>{setDots(Array(N).fill(null));setCap(Array(N).fill(null));setTerr(Array(N).fill(null));setSegs([]);setScores([0,0]);setActive(0);setPaused(false)}
 
   const W=(C-1)*GAP, H=(R-1)*GAP
@@ -131,7 +140,7 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
         </svg>
       </div>
       {earlyOver && !done && null}
-      <ResultsModal open={done} sub={mode==='ai'?'Hra proti AI':'Pass & play'}
+      <ResultsModal open={showModal} sub={mode==='ai'?'Hra proti AI':'Pass & play'}
         title={winTitle}
         line={earlyOver ? `Rozhodnuto! ${scores[0]} : ${scores[1]}` : `Obklíčeno ${scores[0]} : ${scores[1]}`}
         onAgain={restart} onHub={onBack}/>

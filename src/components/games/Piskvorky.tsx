@@ -64,6 +64,7 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
   const [scores, setScores] = useState([0, 0])
   const [winner, setWinner] = useState<number | 'draw' | null>(null)
   const [winCells, setWinCells] = useState<number[]>([])
+  const [showModal, setShowModal] = useState(false)
   const [paused, setPaused] = useState(false)
   const [rules, setRules] = useState(false)
   const players = mkPlayers(mode)
@@ -139,6 +140,15 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
     }
   }, [active, mode, winner, paused, board])
 
+  useEffect(() => {
+    if (winner != null) {
+      const t = setTimeout(() => setShowModal(true), typeof winner === 'number' ? 2000 : 0)
+      return () => clearTimeout(t)
+    } else {
+      setShowModal(false)
+    }
+  }, [winner])
+
   const restart = () => { setBoard(empty()); setActive(0); setWinner(null); setWinCells([]); setPaused(false) }
 
   const winTitle = winner === 'draw' ? 'Remíza!'
@@ -165,7 +175,7 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
           })}
         </div>
       </div>
-      <ResultsModal open={winner != null} sub={mode === 'ai' ? 'Hra proti AI' : 'Pass & play'}
+      <ResultsModal open={showModal} sub={mode === 'ai' ? 'Hra proti AI' : 'Pass & play'}
         title={winTitle} line={winLine} onAgain={restart} onHub={onBack} />
       <RulesSheet open={rules} tag={game.tag} rules={game.rules} onClose={() => setRules(false)} />
     </GameShell>

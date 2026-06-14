@@ -189,6 +189,17 @@ const EN_WORDS = new Set([
   'YACHT','YIELD',
 ])
 
+// User-added words persisted in localStorage
+const loadCustom = (lang: 'cs' | 'en'): Set<string> => {
+  try { return new Set(JSON.parse(localStorage.getItem(`ta-custom-${lang}`) ?? '[]')) } catch { return new Set() }
+}
+const customWords = { cs: loadCustom('cs'), en: loadCustom('en') }
+
+function addCustomWord(word: string, lang: 'cs' | 'en') {
+  customWords[lang].add(word)
+  try { localStorage.setItem(`ta-custom-${lang}`, JSON.stringify([...customWords[lang]])) } catch {}
+}
+
 // Normalize: strip combining diacritics (U+0300–U+036F), uppercase, letters only
 function norm(s: string): string {
   return [...s.normalize('NFD')]
@@ -210,7 +221,8 @@ function canForm(word: string, pool: string[]): boolean {
 }
 
 function isInDict(word: string, lang: 'cs' | 'en'): boolean {
-  return (lang === 'cs' ? CZ_WORDS : EN_WORDS).has(norm(word))
+  const n = norm(word)
+  return (lang === 'cs' ? CZ_WORDS : EN_WORDS).has(n) || customWords[lang].has(n)
 }
 
 // Generate 11 letters with ~4 vowels
@@ -250,6 +262,7 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
   const [rules, setRules] = useState(false)
   const [scores, setScores] = useState([0, 0])
   const [inputError, setInputError] = useState(false)
+  const [dictVersion, setDictVersion] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const p0Ref = useRef<string[]>([])
   const p1Ref = useRef<string[]>([])
@@ -378,14 +391,25 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     )
   }
 
-  const WordChip = ({ word, status }: { word: string; status: 'uniq' | 'shared' | 'invalid' }) => (
+  const WordChip = ({ word, status, onAdd }: { word: string; status: 'uniq' | 'shared' | 'invalid'; onAdd?: () => void }) => (
     <span style={{
-      padding: '4px 10px', borderRadius: 999,
+      display: 'inline-flex', alignItems: 'center', gap: 3,
+      padding: status === 'invalid' ? '4px 5px 4px 10px' : '4px 10px', borderRadius: 999,
       background: status === 'uniq' ? 'var(--accent-tint-medium)' : status === 'shared' ? 'var(--card-bg)' : 'rgba(255,80,80,0.12)',
       color: status === 'uniq' ? 'var(--accent)' : status === 'shared' ? 'var(--text-muted)' : '#ff6b6b',
       fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12,
       textDecoration: status === 'invalid' ? 'line-through' : 'none',
-    }}>{word}</span>
+    }}>
+      {word}
+      {status === 'invalid' && onAdd && (
+        <button onClick={onAdd} title="Přidat do slovníku" style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 18, height: 18, borderRadius: 999, border: 'none', cursor: 'pointer',
+          background: 'rgba(255,255,255,0.15)', color: '#ff6b6b', fontSize: 12, fontWeight: 800,
+          lineHeight: 1, padding: 0, flexShrink: 0,
+        }}>+</button>
+      )}
+    </span>
   )
 
   return (
@@ -508,8 +532,13 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                   {label} — {uniq.length} unik.
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                  {valid.map(w => <WordChip key={w} word={w} status={shared.includes(w) ? 'shared' : 'uniq'} />)}
-                  {all.filter(w => !valid.includes(w)).map(w => <WordChip key={w} word={w} status="invalid" />)}
+                  {valid.map(w => <WordChip key={w + dictVersion} word={w} status={shared.includes(w) ? 'shared' : 'uniq'} />)}
+                  {all.filter(w => !valid.includes(w)).map(w => (
+                    <WordChip key={w + dictVersion} word={w} status="invalid" onAdd={() => {
+                      addCustomWord(w, lang)
+                      setDictVersion(v => v + 1)
+                    }} />
+                  ))}
                   {all.length === 0 && <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>žádná slova</span>}
                 </div>
               </div>
