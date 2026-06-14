@@ -45,6 +45,16 @@ export function GameIcon({ name, size = 44 }: Props) {
         {/* Heart on head */}
         <path d="M36 11 C36 9 33 9 33 11 C33 13 36 15 36 15 C36 15 39 13 39 11 C39 9 36 9 36 11 Z" fill="var(--bg,#06120F)" stroke="none" />
       </svg>)
+    case 'reversi':
+      return (<svg {...c}>
+        <rect x="9" y="9" width="46" height="46" rx="7" />
+        <line x1="32" y1="9" x2="32" y2="55" strokeWidth="2" opacity="0.5" />
+        <line x1="9" y1="32" x2="55" y2="32" strokeWidth="2" opacity="0.5" />
+        <circle cx="21.5" cy="21.5" r="8" fill="currentColor" stroke="none" />
+        <circle cx="42.5" cy="21.5" r="8" fill="none" strokeWidth="2.5" />
+        <circle cx="21.5" cy="42.5" r="8" fill="none" strokeWidth="2.5" />
+        <circle cx="42.5" cy="42.5" r="8" fill="currentColor" stroke="none" />
+      </svg>)
     case 'airplane':
       return (<svg {...c}><path d="M30 8C33 8 34 13 34 20L56 34V40L34 35V49L41 53V57L31 54L21 57V53L28 49V35L6 40V34L28 20C28 13 27 8 30 8Z" /></svg>)
     default: return null

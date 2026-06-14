@@ -1,4 +1,4 @@
-export type GameId = 'piskvorky' | 'tecky' | 'ctyri' | 'hangman' | 'wordchain' | 'osmismerka' | 'slovnik' | 'had'
+export type GameId = 'piskvorky' | 'tecky' | 'ctyri' | 'hangman' | 'wordchain' | 'osmismerka' | 'slovnik' | 'had' | 'reversi'
 export type GameMode = 'ai' | 'pvp'
 
 export interface GameDef {
@@ -67,6 +67,17 @@ export const GAMES: GameDef[] = [
       'Oba hráči dostanou 11 stejných písmen a 90 vteřin.',
       'Pište podstatná jména v prvním pádu (pes, auto, stůl…). Každé písmeno lze v jednom slově použít jen tolikrát, kolikrát se v zásobníku vyskytuje.',
       'Po uplynutí času se odstraní neplatná slova a duplicity (slova, která zadali oba). Vyhrává ten, kdo má víc unikátních platných slov.',
+    ],
+  },
+  {
+    id: 'reversi', icon: 'reversi', title: 'Reversi', accent: '#6366F1',
+    tag: '// obklopuj a přebarvuj', en: false, solo: false,
+    desc: 'Pokládej kameny a obklič soupeřovy řady — získáš je. Vyhrává kdo má na konci víc kamenů.',
+    bestLabel: 'Nejvíc kamenů', defaultBest: '—',
+    rules: [
+      'Hráči se střídají — černé a bílé kameny. Na každý tah musíš obklíčit aspoň jeden soupeřův kámen svislou, vodorovnou nebo šikmou řadou.',
+      'Všechny obklíčené soupeřovy kameny se okamžitě přebarví na tvou barvu.',
+      'Nemáš-li žádný platný tah, přeskočíš. Hra končí, když nikdo nemůže hrát nebo je deska plná — vyhrává více kamenů.',
     ],
   },
   {

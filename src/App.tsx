@@ -10,6 +10,7 @@ import { WordChain } from './components/games/WordChain'
 import { Osmismerka } from './components/games/Osmismerka'
 import { Slovnik } from './components/games/Slovnik'
 import { Had } from './components/games/Had'
+import { Reversi } from './components/games/Reversi'
 
 type Screen = GameId | null
 
@@ -36,6 +37,7 @@ function GameView({ id, mode, onBack, onBestUpdate }: { id: GameId; mode: GameMo
       {id === 'osmismerka' && <Osmismerka {...props} />}
       {id === 'slovnik'    && <Slovnik    {...props} />}
       {id === 'had'        && <Had        {...props} />}
+      {id === 'reversi'    && <Reversi    {...props} />}
     </div>
   )
 }
