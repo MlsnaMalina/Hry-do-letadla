@@ -1,71 +1,78 @@
 // Shared dictionary — used by Slovní fotbal and Osmisměrka
 
 // Normalize: strip combining diacritics (U+0300–U+036F), uppercase, letters only
+// Used for pool-matching (canForm) only — NOT for dictionary lookup
 export function norm(s: string): string {
   return [...s.normalize('NFD')]
     .filter(c => { const cc = c.charCodeAt(0); return cc < 0x0300 || cc > 0x036f })
     .join('').toUpperCase().replace(/[^A-Z]/g, '')
 }
 
-// Czech nouns — normalized (uppercase, no diacritics), verified first-case singular only
+// Canonical key for Czech: uppercase, keep diacritics
+// "čas" → "ČAS", "Město" → "MĚSTO"
+export function canonCz(s: string): string {
+  return s.toUpperCase().normalize('NFC')
+}
+
+// Czech nouns — canonical uppercase WITH diacritics
 export const CZ_WORDS = new Set([
   // 3-letter
   'PES','LES','NOS','KOS','LOS','ROK','TOK','BOD','LED','MED','ROD','SAD',
   'DUB','LUK','MAK','RAK','LEV','BOL','KOL','VAL','KAL','BOR','BOK','KOP',
   'COP','SOK','PUK','TUK','SUK','BUK','DEN','SEN','SOL','VAZ','LEM','PAN',
-  'TUR','BAL','VAN','HAD','SYN','NOC','HRA','NIT','LOV','MIR','VIR','DAR',
-  'VUL','ZUB','OKO','MIC','VEZ','MUZ','KRK','LAK','PAR','ZAK','CAJ','VLK',
-  'CAP','LOD','CAS','GOL','GEN','CIN','SUL','KUN','DUM','LOB','HRB','NUZ',
-  'TES','PAS','BOJ','TAH','VRH','ZIP','KRB','BRK','ZAL','VAR','KAZ','RAZ',
-  'BAS','TRN','SUP','LUP','MOP','TOP','SUM','ROH','BEH','SEK','MOL','VEC',
+  'TUR','BAL','VAN','HAD','SYN','NOC','HRA','NIT','LOV','MÍR','VÍR','DAR',
+  'VŮL','ZUB','OKO','MÍČ','VĚŽ','MUŽ','KRK','LAK','PÁR','ŽÁK','ČAJ','VLK',
+  'ČÁP','LOĎ','ČAS','GÓL','GEN','ČIN','SŮL','KŮŇ','DŮM','LOB','HRB','NŮŽ',
+  'PAS','BOJ','TAH','VRH','ZIP','KRB','BRK','ŽAL','VAR','KAZ','RÁZ',
+  'BAS','TRN','SUP','LUP','MOP','TOP','ŠUM','ROH','BĚH','MOL','VĚC',
   // 4-letter
   'AUTO','KOLO','DRAK','HRAD','VLAK','MRAK','MOST','DUCH','HORA','NEBE',
   'POLE','MAPA','NOTA','PLAZ','LIST','KOST','HOST','PLES','SLON','BRAT',
   'VLAS','HLAS','DRES','RYBA','NOHA','RUKA','VODA','KOZA','BOTA','SKLO',
-  'KREV','SLOH','PRAK','TRAK','VLNA','ROLE','NORA','KOTA','LATA','PLOT',
-  'TVOR','LANO','PERO','PIVO','SENO','MENU','VINO','PRSA','TRON','DATA',
-  'KRAL','STUL','LAMA','RANA','HLUK','TVAR','OBAL','BRAK','KLAN','PLAN',
-  'KLUK','SOVA','OKNO','DVUR','KMEN','SLZA','ZADA','USTA','UCHO','KVET',
-  'REKA','MORE','BROD','MASO','JARO','LETO','ZIMA','RANO','MLHA','ROSA',
-  'MRAZ','SNEH','DEST','KAVA','CUKR','OLEJ','PTAK','OVCE','OREL','TYGR',
-  'BOBR','OSEL','SOUD','PARK','GOLF','UHEL','PRST','PLOD','TETA','OTEC',
-  'ZEME','KRAJ','CENA','PLAT','STAV','CHUT','DLAN','JAMA','PATA','PENA',
-  'SVET','TRAM','TAXI','KUFR','VLEC','DZEM',
-  'ZRAK','PUSA','KUNA','KOSA','MISA','OSUD','GRIL','STAN','DECH','VLEK',
+  'KREV','SLOH','PRAK','TRAK','VLNA','ROLE','NORA','KÓTA','LATA','PLOT',
+  'TVOR','LANO','PERO','PIVO','SENO','MENU','VÍNO','PRSA','TRŮN','DATA',
+  'KRÁL','STŮL','LAMA','RÁNA','HLUK','TVAR','OBAL','BRAK','KLAN','PLÁN',
+  'KLUK','SOVA','OKNO','DVŮR','KMEN','SLZA','ZÁDA','ÚSTA','UCHO','KVĚT',
+  'ŘEKA','MOŘE','BROD','MASO','JARO','LÉTO','ZIMA','RÁNO','MLHA','ROSA',
+  'MRÁZ','SNÍH','DÉŠŤ','KÁVA','CUKR','OLEJ','PTÁK','OVCE','OREL','TYGR',
+  'BOBR','OSEL','SOUD','PARK','GOLF','ÚHEL','PRST','PLOD','TETA','OTEC',
+  'ZEMĚ','KRAJ','CENA','PLAT','STAV','CHUŤ','DLAŇ','JÁMA','PATA','PĚNA',
+  'SVĚT','TRAM','TAXI','KUFR','DŽEM','DÍTĚ',
+  'ZRAK','PUSA','KUNA','KOSA','MÍSA','OSUD','GRIL','STAN','DECH','VLEK',
   'HROB','BLOK','KLAM','RUCH','TISK','TLAK','VRAH','ZISK','DISK','FILM',
-  'KLUB','TEST','PRUH','SRUB','PUCH','STEH','DRAP','OCKO','VRCH','UZEL',
-  'VRAK','KRAB','SMYK','STUD','KRES','SKOK','KLON','CHOV','CHOD','CHOR',
-  'OHEN','OCEL','OCET','OPAD','UZAS','URAZ','UTEK','UTOK',
-  'VRBA','VRES','ZDAR','ZPEV','ZROD','ZVON','RISK',
+  'KLUB','TEST','PRUH','SRUB','PUCH','STEH','DRÁP','OČKO','VRCH','UZEL',
+  'VRAK','KRAB','SMYK','STUD','SKOK','KLON','CHOV','CHOD','CHÓR',
+  'OHEŇ','OCEL','OCET','OPAD','ÚŽAS','ÚRAZ','ÚTĚK','ÚTOK',
+  'VRBA','VŘES','ZDAR','ZPĚV','ZROD','ZVON',
   // 5-letter
-  'KAMEN','HLAVA','KNIHA','SALON','BARON','BETON','OPERA','BANDA','LAMPA',
-  'KAPSA','VLAST','STROM','PANDA','METAL','HOTEL','MOTOR','PILOT','BALON',
-  'POKER','ROMAN','KORAL','PEDAL','RADAR','NAROD','NORMA','SKALA',
-  'TENOR','TRAKT','TRUBA','KRASA','BRADA','KABEL','KABAT','TALIR',
-  'SOLAR','NYLON','PYLON','DEMON','BONUS','KOSAR','PLECH','TREST','POLKA',
-  'SKOLA','MESTO','ULICE','BANKA','POSTA','SPORT','PISEN','TANEC','HUDBA',
-  'SLOVO','DIVKA','STRYC','LEKAR','TRIDA','LOUKA','ZELVA','MLEKO','JIDLO',
-  'BUBEN','PRAVO','ZAKON','VLADA','VALKA','VOJAK','VECER','TYDEN',
-  'JAZYK','BARVA','MATKA','HOLKA','DITE','VEJCE','CHLEB','VRANA',
-  'HOLUB','PRASE','KRAVA','LISKA','ZAJIC','KOCKA','MYSKA',
-  'KOTEL','LAVOR','KOSIK','TRASA','PASTA','KLIMA','TABOR',
-  'BLATO','OKRAJ','DOPIS','OBLAK','OHLAS','OSADA','KUPKA','PALEC',
-  'BREZA','JASAN','TRAVA','JETEL','KAPKA','VLHKO','OBLEK','SUKNE','RUKAV',
-  'CESTA','PISEK','PRACH','BAHNO','HLINA','VODKA','SIRUP','DROBY','LIKER',
-  'OPONA','MASKA','SOCHA','OLTAR','OBRAZ','ZAMEK','BRANA','DVERE',
-  'SKLEP','KOMIN','STROP','LAVKA','UDOLI','JELEN','KOPEC','ZIMAK',
-  'MOZEK','SRDCE','HOKEJ','TENIS','JEZEK','HRNEK','SKRIN','KOLAC','GULAS',
+  'KÁMEN','HLAVA','KNIHA','SALON','BARON','BETON','OPERA','BANDA','LAMPA',
+  'KAPSA','VLAST','STROM','PANDA','METAL','HOTEL','MOTOR','PILOT','BALÓN',
+  'POKER','ROMÁN','KORÁL','PEDÁL','RADAR','NÁROD','NORMA','SKÁLA',
+  'TENOR','TRAKT','KRÁSA','BRADA','KABEL','KABÁT','TALÍŘ',
+  'NYLON','PYLÓN','DÉMON','BONUS','KOŠÁŘ','PLECH','TREST','POLKA',
+  'ŠKOLA','MĚSTO','ULICE','BANKA','POŠTA','SPORT','PÍSEŇ','TANEC','HUDBA',
+  'SLOVO','DÍVKA','STRÝC','LÉKAŘ','TŘÍDA','LOUKA','ŽELVA','MLÉKO','JÍDLO',
+  'BUBEN','PRÁVO','ZÁKON','VLÁDA','VÁLKA','VOJÁK','VEČER','TÝDEN',
+  'JAZYK','BARVA','MATKA','HOLKA','VEJCE','CHLÉB','VRÁNA',
+  'HOLUB','PRASE','KRÁVA','LIŠKA','ZAJÍC','KOČKA','MYŠKA',
+  'KOTEL','LAVOR','KOŠÍK','TRASA','PASTA','KLIMA','TÁBOR',
+  'BLÁTO','OKRAJ','DOPIS','OBLAK','OHLAS','OSADA','KUPKA','PALEC',
+  'BŘÍZA','JASAN','TRÁVA','JETEL','KAPKA','VLHKO','OBLEK','SUKNĚ','RUKÁV',
+  'CESTA','PÍSEK','PRACH','BAHNO','HLÍNA','VODKA','SIRUP','LIKÉR',
+  'OPONA','MASKA','SOCHA','OLTÁŘ','OBRAZ','ZÁMEK','BRÁNA','DVEŘE',
+  'SKLEP','KOMÍN','STROP','LAVKA','ÚDOLÍ','JELEN','KOPEC','ZIMÁK',
+  'MOZEK','SRDCE','HOKEJ','TENIS','JEŽEK','HRNEK','SKŘÍŇ','KOLÁČ','GULÁŠ',
   // 6-letter
-  'BALKON','KOLONA','KLOKAN','KOSMOS','BANKET','KORUNA','KARTON',
-  'JEZERO','KOCOUR','MEDVED','KACHNA','NOZDRA','DOKTOR','SESTRA',
-  'UCITEL','ZNAMKA','STRAKA','LASICE','KUFRIK','STRANA','OBCHOD',
+  'BALKÓN','KOLONA','KLOKAN','KOSMOS','BANKET','KORUNA','KARTON',
+  'JEZERO','KOCOUR','MEDVĚD','KACHNA','NOZDRA','DOKTOR','SESTRA',
+  'UČITEL','ZNÁMKA','STRAKA','LASICE','KUFŘÍK','STRANA','OBCHOD',
   'FOTBAL','KOLENO','RAMENO','HODINA','MINUTA','PODZIM','KYTARA',
   // 7+
-  'NEMOCNICE','ZAHRADA','LETISTE','NADRAZI','LEKARNA','VESNICE',
-  'STUDENT','POLEVKA','KABARET','LETADLO','SLEPICE','VEVERKA',
+  'NEMOCNICE','ZAHRADA','LETIŠTĚ','NÁDRAŽÍ','LÉKÁRNA','VESNICE',
+  'STUDENT','POLÉVKA','KABARET','LETADLO','SLEPICE','VEVERKA',
 ])
 
-// English nouns — common nouns for word-finding
+// English nouns — common nouns for word-finding (stored uppercase, no diacritics)
 export const EN_WORDS = new Set([
   'ACE','AGE','AID','AIR','APE','ARC','ARM','ART','ASH',
   'BAR','BAT','BAY','BED','BEE','BOW','BOX','BUD','BUG','BUS',
@@ -170,62 +177,68 @@ export const EN_WORDS = new Set([
   'YACHT','YIELD',
 ])
 
-// User-added words persisted in localStorage
+// User-added words — stored in canonical form (Czech: uppercase with diacritics, English: uppercase)
 const loadCustom = (lang: 'cs' | 'en'): Set<string> => {
   try { return new Set(JSON.parse(localStorage.getItem(`ta-custom-${lang}`) ?? '[]')) } catch { return new Set() }
 }
 export const customWords = { cs: loadCustom('cs'), en: loadCustom('en') }
 
 export function addCustomWord(word: string, lang: 'cs' | 'en') {
-  customWords[lang].add(word)
+  const key = lang === 'cs' ? canonCz(word) : norm(word)
+  customWords[lang].add(key)
   try { localStorage.setItem(`ta-custom-${lang}`, JSON.stringify([...customWords[lang]])) } catch {}
 }
 
-// Banned words — permanently removed from the effective dictionary
+// Banned words — stored in canonical form
 const loadBanned = (lang: 'cs' | 'en'): Set<string> => {
   try { return new Set(JSON.parse(localStorage.getItem(`ta-banned-${lang}`) ?? '[]')) } catch { return new Set() }
 }
 export const bannedWords = { cs: loadBanned('cs'), en: loadBanned('en') }
 
 export function banWord(word: string, lang: 'cs' | 'en') {
-  bannedWords[lang].add(word)
-  customWords[lang].delete(word)
+  const key = lang === 'cs' ? canonCz(word) : norm(word)
+  bannedWords[lang].add(key)
+  customWords[lang].delete(key)
   try {
     localStorage.setItem(`ta-banned-${lang}`, JSON.stringify([...bannedWords[lang]]))
     localStorage.setItem(`ta-custom-${lang}`, JSON.stringify([...customWords[lang]]))
   } catch {}
 }
 
+// Dictionary lookup
+// Czech: requires exact canonical form — "čas" → "ČAS" in set; "cas" → "CAS" NOT in set
+// English: case-insensitive, no diacritics (norm)
 export function isInDict(word: string, lang: 'cs' | 'en'): boolean {
-  const n = norm(word)
-  if (bannedWords[lang].has(n)) return false
-  return (lang === 'cs' ? CZ_WORDS : EN_WORDS).has(n) || customWords[lang].has(n)
-}
-
-// Build a word pool for Osmisměrka: CZ words length 3–8, + custom, – banned
-export function osmiWordPool(): string[] {
-  const pool: string[] = []
-  for (const w of CZ_WORDS) if (w.length >= 3 && w.length <= 8) pool.push(w)
-  for (const w of customWords.cs) {
-    const n = norm(w)
-    if (n.length >= 3 && n.length <= 8 && !bannedWords.cs.has(n)) pool.push(n)
+  if (lang === 'cs') {
+    const key = canonCz(word)
+    if (bannedWords.cs.has(key)) return false
+    return CZ_WORDS.has(key) || customWords.cs.has(key)
+  } else {
+    const key = norm(word)
+    if (bannedWords.en.has(key)) return false
+    return EN_WORDS.has(key) || customWords.en.has(key)
   }
-  return pool
 }
 
-// Pick n random words from the pool (no duplicates)
+// Words for Czech Osmisměrka: 3–8 chars, with diacritics, excluding banned
 export function pickOsmiWords(n: number): string[] {
-  const pool = osmiWordPool()
-  const result: string[] = []
-  const used = new Set<string>()
-  // Shuffle
+  const pool: string[] = []
+  for (const w of CZ_WORDS) if (w.length >= 3 && w.length <= 8 && !bannedWords.cs.has(w)) pool.push(w)
+  for (const w of customWords.cs) if (w.length >= 3 && w.length <= 8 && !bannedWords.cs.has(w)) pool.push(w)
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]]
   }
-  for (const w of pool) {
-    if (!used.has(w) && !bannedWords.cs.has(w)) { used.add(w); result.push(w) }
-    if (result.length >= n) break
+  return pool.slice(0, n)
+}
+
+// Words for English Osmisměrka: 4–7 chars, excluding banned
+export function pickEnWords(n: number): string[] {
+  const pool: string[] = []
+  for (const w of EN_WORDS) if (w.length >= 4 && w.length <= 7 && !bannedWords.en.has(w)) pool.push(w)
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]]
   }
-  return result
+  return pool.slice(0, n)
 }

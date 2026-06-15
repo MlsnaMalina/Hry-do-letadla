@@ -2,16 +2,23 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { GameShell, RulesSheet } from '../shell/GameShell'
 import { RoughFrame } from '../primitives/RoughFrame'
 import type { GameDef, GameMode } from '../../data/games'
-import { norm, CZ_WORDS, EN_WORDS, addCustomWord, bannedWords, banWord, isInDict } from '../../data/dict'
+import { norm, canonCz, CZ_WORDS, EN_WORDS, addCustomWord, bannedWords, banWord, isInDict } from '../../data/dict'
 
 const ROUND_SECS = 90
 
+// Canonical key for a word in this language
+function canonical(word: string, lang: 'cs' | 'en'): string {
+  return lang === 'cs' ? canonCz(word) : norm(word)
+}
+
 // Can this word be formed from the letter pool?
+// Czech: exact char match (Č ≠ C, Á ≠ A) — pool and word both use canonical uppercase
+// English: same (no diacritics anyway)
 function canForm(word: string, pool: string[]): boolean {
-  const n = norm(word)
-  if (n.length < 2) return false
+  const chars = [...word]  // spread handles multi-byte chars
+  if (chars.length < 2) return false
   const avail = [...pool]
-  for (const ch of n) {
+  for (const ch of chars) {
     const i = avail.indexOf(ch)
     if (i === -1) return false
     avail.splice(i, 1)
@@ -19,9 +26,10 @@ function canForm(word: string, pool: string[]): boolean {
   return true
 }
 
-// Generate 11 letters with ~4 vowels
+// Generate 11 letters from a language-appropriate pool
 function genLetters(lang: 'cs' | 'en'): string[] {
-  const CZ = 'AAAABBCCDDDEEEEEFFGGHHIIIIJKKKLLLMMNNNNNOOOOPPPRRRSSSTTTTTUUUUVVZZ'
+  // Czech: includes accented letters so players can form real Czech words
+  const CZ = 'AAAÁBBCČDDDEEĚÉFGGHHIÍIJKKKLLMMNNNNOOPPRRŘSSŠTTTUUŮŮVVYZÝŽŽ'
   const EN = 'AAAAAABBCCDDDEEEEEEFFFGGHHIIIIIIJKKLLLLLMMNNNNOOOOOOOPPPRRRRSSSSTTTTTTUUUUVVWWYZ'
   const src = (lang === 'cs' ? CZ : EN).split('')
   const chosen: string[] = []
@@ -36,7 +44,9 @@ function genLetters(lang: 'cs' | 'en'): string[] {
 function findAiWords(pool: string[], lang: 'cs' | 'en'): string[] {
   const dict = lang === 'cs' ? CZ_WORDS : EN_WORDS
   const result: string[] = []
-  for (const word of dict) if (canForm(word, pool) && !bannedWords[lang].has(word)) result.push(word)
+  for (const word of dict) {
+    if (canForm(word, pool) && !bannedWords[lang].has(word)) result.push(word)
+  }
   return result.sort(() => Math.random() - 0.5)
 }
 
@@ -116,33 +126,32 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     return () => timeouts.forEach(clearTimeout)
   }, [letters, lang, mode])
 
-  // Compute which letter tiles are consumed by current input
-  const normInput = norm(input)
-  const inputLetterCounts: Record<string, number> = {}
-  for (const ch of normInput) inputLetterCounts[ch] = (inputLetterCounts[ch] || 0) + 1
+  // Compute which letter tiles are consumed by current input (exact char match)
+  const inputCounts: Record<string, number> = {}
+  for (const ch of [...input]) inputCounts[ch] = (inputCounts[ch] || 0) + 1
   const tileConsumed = (() => {
     const counts: Record<string, number> = {}
     return letters.map(l => {
       counts[l] = (counts[l] || 0) + 1
-      return counts[l] - 1 < (inputLetterCounts[l] || 0)
+      return counts[l] - 1 < (inputCounts[l] || 0)
     })
   })()
 
   const submit = () => {
     const raw = input.trim()
-    const n = norm(raw)
-    if (n.length < 2) return
+    if (raw.length < 2) return
     if (!canForm(raw, letters)) {
       setInputError(true)
       setTimeout(() => setInputError(false), 500)
       if ('vibrate' in navigator) navigator.vibrate([20, 30, 20])
       return
     }
+    const key = canonical(raw, lang)
     const currentWords = pvpTurn === 0 ? p0Words : p1Words
-    if (currentWords.includes(n)) { setInput(''); return }
+    if (currentWords.includes(key)) { setInput(''); return }
     if ('vibrate' in navigator) navigator.vibrate(8)
-    if (pvpTurn === 0) setP0Words(w => [...w, n])
-    else setP1Words(w => [...w, n])
+    if (pvpTurn === 0) setP0Words(w => [...w, key])
+    else setP1Words(w => [...w, key])
     setInput('')
     inputRef.current?.focus()
   }
@@ -268,7 +277,7 @@ export function Slovnik({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
         <input
           ref={inputRef}
           value={input}
-          onChange={e => setInput(norm(e.target.value))}
+          onChange={e => setInput(e.target.value.toUpperCase().normalize('NFC'))}
           onKeyDown={e => e.key === 'Enter' && submit()}
           placeholder={lang === 'cs' ? 'Napiš podstatné jméno…' : 'Type a noun…'}
           autoCapitalize="characters"

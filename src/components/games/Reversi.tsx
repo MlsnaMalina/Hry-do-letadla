@@ -138,20 +138,17 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     setSkipped(false); setWinner(null); setPaused(false)
   }
 
-  const S = 36 // cell px
-  const PIECE_D = S - 7
-
-  // Piece visuals: player 0 = dark, player 1 = light
+  // Piece visuals: percentage sizing so the board scales responsively
   const pieceStyle = (p: 0|1, isWin: boolean) => {
     const dark = p === 0
     const base = dark
       ? 'radial-gradient(circle at 36% 30%, #4b5563, #0f172a 80%)'
       : 'radial-gradient(circle at 36% 30%, #ffffff, #d1d5db 80%)'
     return {
-      width: PIECE_D, height: PIECE_D, borderRadius: 999,
+      width: '78%', height: '78%', borderRadius: '50%',
       background: base,
       boxShadow: isWin
-        ? `0 0 0 2.5px var(--accent), 0 0 14px var(--accent), ${dark ? '0 2px 6px rgba(0,0,0,0.7)' : '0 2px 8px rgba(0,0,0,0.35)'}`
+        ? `0 0 0 2px var(--accent), 0 0 12px var(--accent), ${dark ? '0 2px 6px rgba(0,0,0,0.7)' : '0 2px 8px rgba(0,0,0,0.35)'}`
         : dark
           ? '0 2px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12)'
           : '0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.9)',
@@ -182,16 +179,18 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
         </div>
       )}
 
+      {/* Board — fills available width responsively */}
       <div style={{
-        position: 'relative', padding: 8, borderRadius: 16,
+        position: 'relative', padding: 6, borderRadius: 16,
+        width: 'min(calc(100vw - 32px), calc(100vh - 260px), 380px)',
         background: 'linear-gradient(160deg, color-mix(in srgb, #14532d 55%, var(--card-solid)), color-mix(in srgb, #052e16 55%, var(--card-solid)))',
         boxShadow: 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 6px rgba(0,0,0,0.4)',
       }}>
         <RoughFrame stroke="rgba(255,255,255,0.12)" strokeWidth={1} radius={16} />
         <div style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${N}, ${S}px)`,
-          gridTemplateRows: `repeat(${N}, ${S}px)`,
+          gridTemplateColumns: `repeat(${N}, 1fr)`,
+          aspectRatio: '1',
           gap: 1, background: 'rgba(0,0,0,0.35)', borderRadius: 10,
           boxShadow: 'inset 0 0 12px rgba(0,0,0,0.4)',
           overflow: 'hidden',
@@ -205,7 +204,6 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                 key={i}
                 onClick={() => { if (isValid && !paused) place(i) }}
                 style={{
-                  width: S, height: S,
                   display: 'grid', placeItems: 'center',
                   background: isValid
                     ? 'rgba(99,102,241,0.18)'
@@ -219,7 +217,7 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                   <div style={pieceStyle(val, !!isWin)} />
                 ) : isValid ? (
                   <div style={{
-                    width: 9, height: 9, borderRadius: 999,
+                    width: '28%', height: '28%', borderRadius: '50%',
                     background: 'var(--accent)', opacity: 0.55,
                     boxShadow: '0 0 6px var(--accent)',
                   }} />
