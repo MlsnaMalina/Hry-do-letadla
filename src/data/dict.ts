@@ -220,16 +220,32 @@ export function isInDict(word: string, lang: 'cs' | 'en'): boolean {
   }
 }
 
-// Words for Czech Osmisměrka: 3–8 chars, with diacritics, excluding banned
-export function pickOsmiWords(n: number): string[] {
-  const pool: string[] = []
-  for (const w of CZ_WORDS) if (w.length >= 3 && w.length <= 8 && !bannedWords.cs.has(w)) pool.push(w)
-  for (const w of customWords.cs) if (w.length >= 3 && w.length <= 8 && !bannedWords.cs.has(w)) pool.push(w)
-  for (let i = pool.length - 1; i > 0; i--) {
+const HAS_CZ_DIACRITIC = /[ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/
+
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]]
+    [arr[i], arr[j]] = [arr[j], arr[i]]
   }
-  return pool.slice(0, n)
+  return arr
+}
+
+// Words for Czech Osmisměrka: 3–8 chars, at least 2/3 have Czech diacritics
+export function pickOsmiWords(n: number): string[] {
+  const withD: string[] = []
+  const noD: string[] = []
+  for (const w of CZ_WORDS) {
+    if (w.length < 3 || w.length > 8 || bannedWords.cs.has(w)) continue
+    if (HAS_CZ_DIACRITIC.test(w)) withD.push(w)
+    else noD.push(w)
+  }
+  for (const w of customWords.cs) {
+    if (w.length >= 3 && w.length <= 8 && !bannedWords.cs.has(w)) withD.push(w)
+  }
+  shuffle(withD); shuffle(noD)
+  const nWithD = Math.min(Math.ceil(n * 2 / 3), withD.length)
+  const nNoD = Math.min(n - nWithD, noD.length)
+  return shuffle([...withD.slice(0, nWithD), ...noD.slice(0, nNoD)])
 }
 
 // Words for English Osmisměrka: 4–7 chars, excluding banned

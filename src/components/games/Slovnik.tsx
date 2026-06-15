@@ -28,8 +28,8 @@ function canForm(word: string, pool: string[]): boolean {
 
 // Generate 11 letters from a language-appropriate pool
 function genLetters(lang: 'cs' | 'en'): string[] {
-  // Czech: includes accented letters so players can form real Czech words
-  const CZ = 'AAAÁBBCČDDDEEĚÉFGGHHIÍIJKKKLLMMNNNNOOPPRRŘSSŠTTTUUŮŮVVYZÝŽŽ'
+  // Czech: ~30 % diacritic letters so hands reliably contain Č, Á, Í, Ž, Ů…
+  const CZ = 'AAÁÁBBCČČDDEEEĚĚÉFGHHIÍIÍJKKLMMNNNOOPRRŘSSSŠTTTUŮŮŮVVYZÝŽŽŽ'
   const EN = 'AAAAAABBCCDDDEEEEEEFFFGGHHIIIIIIJKKLLLLLMMNNNNOOOOOOOPPPRRRRSSSSTTTTTTUUUUVVWWYZ'
   const src = (lang === 'cs' ? CZ : EN).split('')
   const chosen: string[] = []
