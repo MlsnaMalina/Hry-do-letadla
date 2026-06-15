@@ -2,23 +2,47 @@ import { useState, useEffect, useRef } from 'react'
 import { GameShell, ResultsModal, RulesSheet, CountdownTimer } from '../shell/GameShell'
 import { RoughFrame } from '../primitives/RoughFrame'
 import { WORDCHAIN_OK } from '../../data/words'
+import { isInDict } from '../../data/dict'
 import type { GameDef, GameMode } from '../../data/games'
 
 const START = 7
 
-// Diverse starting words — varied last letters so each game starts differently
-const STARTERS = [
-  'BRAVE','CLEAN','WATER','SPORT','BLOOM','GRACE','GLOBE','DREAM',
-  'STONE','PLANE','FLAME','CLOUD','FROST','PROUD','CRANE','BLEND',
-  'TOWER','TRACK','BREAD','STERN','OCEAN','PLAIN','STORM','CHAIR',
-  'NORTH','LIGHT','CRAFT','CHEST','BRUSH','DANCE','MUSIC','NOVEL',
+// English starters — balanced last-letter distribution so each game starts on a different letter
+const EN_STARTERS = [
+  'BRAVE','CRANE','DANCE','MUSIC',
+  'CLEAN','STERN','CABIN','LEMON',
+  'SPORT','LIGHT','CRAFT','SCOUT',
+  'BLOOM','DREAM','STORM','CREAM',
+  'CLOUD','BLEND','BREAD','PROUD',
+  'WATER','TOWER','TIGER','NORTH',
+  'TRACK','BLACK','BLANK','CHALK',
+  'NOVEL','METAL','FLASH','GLASS',
 ]
-const pickStarter = () => STARTERS[Math.floor(Math.random() * STARTERS.length)]
+
+// Czech starters — diverse endings, all verified present in CZ_WORDS
+const CS_STARTERS = [
+  'ŠKOLA','KRÁVA','BRÁNA','HORA','MAPA',
+  'MOŘE','DVEŘE',
+  'KOLO','AUTO','LÉTO','RÁNO','OKNO',
+  'MOST','HOST',
+  'HRAD',
+  'DRAK','PTÁK','VLAK',
+  'DŮM',
+  'SLON','BALÓN',
+  'MÍČ','MUŽ',
+  'PLES','HLAS',
+]
+
+const pickStarter = (lang: 'cs' | 'en') => {
+  const list = lang === 'cs' ? CS_STARTERS : EN_STARTERS
+  return list[Math.floor(Math.random() * list.length)]
+}
 
 interface Props { game: GameDef; mode: GameMode; turnStyle?: string; onBack: () => void; onBestUpdate?: (v: string) => void }
 
 export function WordChain({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
-  const [chain, setChain] = useState<string[]>(() => [pickStarter()])
+  const [lang, setLang] = useState<'cs' | 'en'>('en')
+  const [chain, setChain] = useState<string[]>(() => [pickStarter('en')])
   const [time, setTime] = useState(START)
   const [active, setActive] = useState(0)
   const [over, setOver] = useState(false)
@@ -31,7 +55,7 @@ export function WordChain({ game, mode, turnStyle, onBack, onBestUpdate }: Props
     ? [{ name: 'Vy', mark: '1', color: 'var(--accent)' }]
     : [{ name: 'Hráč 1', mark: '1', color: 'var(--accent)' }, { name: 'Hráč 2', mark: '2', color: 'var(--text)' }]
   const last = chain[chain.length - 1]
-  const needLetter = last[last.length - 1]
+  const needLetter = [...last].at(-1)!
   const used = new Set(chain)
 
   useEffect(() => {
@@ -48,29 +72,49 @@ export function WordChain({ game, mode, turnStyle, onBack, onBestUpdate }: Props
 
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault()
-    const w = val.trim().toUpperCase()
+    const w = val.trim().toUpperCase().normalize('NFC')
     if (!w) return
-    if (w[0] !== needLetter) { flash(`Musí začínat na „${needLetter}"`); return }
-    if (used.has(w)) { flash('Slovo už bylo'); return }
-    if (!WORDCHAIN_OK.has(w.toLowerCase()) && w.length < 3) { flash('Neznámé slovo'); return }
+    if ([...w][0] !== needLetter) { flash(`Musí začínat na „${needLetter}"`); return }
+    if (used.has(w)) { flash('Slovo už bylo použito'); return }
+    const valid = lang === 'cs'
+      ? isInDict(w, 'cs') || w.length >= 4
+      : WORDCHAIN_OK.has(w.toLowerCase()) || w.length >= 4
+    if (!valid) { flash('Neznámé slovo'); return }
     const newChain = [...chain, w]
     setChain(newChain); setVal(''); setErr('')
-    const chainLen = newChain.length - 1
-    onBestUpdate?.(`${chainLen} slov`)
-    const speed = Math.max(3, START - chainLen * 0.4)
-    setTime(speed)
+    onBestUpdate?.(`${newChain.length - 1} slov`)
+    setTime(START)
     if (mode !== 'ai') setActive(a => 1 - a)
     setTimeout(() => inputRef.current?.focus(), 10)
   }
 
   const flash = (m: string) => { setErr(m); setTimeout(() => setErr(''), 1200) }
-  const restart = () => { setChain([pickStarter()]); setTime(START); setActive(0); setOver(false); setPaused(false); setVal(''); setErr(''); setTimeout(() => inputRef.current?.focus(), 30) }
+
+  const restart = (newLang = lang) => {
+    setChain([pickStarter(newLang)]); setTime(START); setActive(0)
+    setOver(false); setPaused(false); setVal(''); setErr('')
+    setTimeout(() => inputRef.current?.focus(), 30)
+  }
+
+  const changeLang = (l: 'cs' | 'en') => { setLang(l); restart(l) }
 
   return (
     <GameShell players={players} active={active} winner={undefined}
       scores={[{ value: chain.length - 1, color: 'var(--accent)' }]} turnStyle={turnStyle}
-      onBack={onBack} onRestart={restart} onPause={() => setPaused(p => !p)} paused={paused} onRules={() => setRules(true)}>
+      onBack={onBack} onRestart={() => restart()} onPause={() => setPaused(p => !p)} paused={paused} onRules={() => setRules(true)}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, width: '100%' }}>
+        {/* language selector */}
+        <div style={{ display: 'flex', gap: 6 }}>
+          {(['cs', 'en'] as const).map(l => (
+            <button key={l} onClick={() => changeLang(l)} style={{
+              padding: '5px 14px', borderRadius: 999, border: 'none', cursor: 'pointer',
+              background: lang === l ? 'var(--accent)' : 'var(--card-bg)',
+              color: lang === l ? '#06120F' : 'var(--text-muted)',
+              fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 11,
+              transition: 'background .15s, color .15s',
+            }}>{l === 'cs' ? 'čeština' : 'english'}</button>
+          ))}
+        </div>
         <CountdownTimer value={time} total={START} style="ring" paused={paused} />
         {/* required letter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -97,10 +141,10 @@ export function WordChain({ game, mode, turnStyle, onBack, onBestUpdate }: Props
           <button type="submit" disabled={over || paused} style={{ position: 'relative', width: '100%', padding: '14px', border: 'none', background: 'var(--accent)', color: '#06120F', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15, cursor: 'pointer', borderRadius: 14, boxShadow: '0 0 22px var(--accent-tint-strong)' }}>Potvrdit ↵</button>
         </form>
       </div>
-      <ResultsModal open={over} sub="Rapid-fire English"
+      <ResultsModal open={over} sub={lang === 'cs' ? 'Řetěz slov — čeština' : 'Řetěz slov — angličtina'}
         title={mode !== 'ai' ? (1 - active === 0 ? 'Vyhrává Hráč 1!' : 'Vyhrává protihráč!') : 'Čas vypršel'}
         line={`Řetěz: ${chain.length - 1} slov`}
-        onAgain={restart} onHub={onBack} />
+        onAgain={() => restart()} onHub={onBack} />
       <RulesSheet open={rules} tag={game.tag} rules={game.rules} onClose={() => setRules(false)} />
     </GameShell>
   )

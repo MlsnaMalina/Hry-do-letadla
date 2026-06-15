@@ -138,20 +138,17 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
     setSkipped(false); setWinner(null); setPaused(false)
   }
 
-  // Piece visuals: percentage sizing so the board scales responsively
+  // Neon pieces: player 0 = pink, player 1 = blue
   const pieceStyle = (p: 0|1, isWin: boolean) => {
-    const dark = p === 0
-    const base = dark
-      ? 'radial-gradient(circle at 36% 30%, #4b5563, #0f172a 80%)'
-      : 'radial-gradient(circle at 36% 30%, #ffffff, #d1d5db 80%)'
+    const col = p === 0 ? '#FF3EA5' : '#38BDF8'
+    const colLight = `color-mix(in srgb, ${col} 58%, #fff)`
+    const colDark = `color-mix(in srgb, ${col} 72%, #000)`
     return {
       width: '78%', height: '78%', borderRadius: '50%',
-      background: base,
+      background: `radial-gradient(circle at 36% 32%, ${colLight}, ${col} 50%, ${colDark})`,
       boxShadow: isWin
-        ? `0 0 0 2px var(--accent), 0 0 12px var(--accent), ${dark ? '0 2px 6px rgba(0,0,0,0.7)' : '0 2px 8px rgba(0,0,0,0.35)'}`
-        : dark
-          ? '0 2px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.12)'
-          : '0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.9)',
+        ? `0 0 0 2px rgba(255,255,255,0.25), 0 0 20px ${col}, inset 0 1.5px 0 rgba(255,255,255,0.5)`
+        : `0 0 10px ${col}66, inset 0 1.5px 0 rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.5)`,
       transition: 'box-shadow .2s',
     }
   }
@@ -183,8 +180,8 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
       <div style={{
         position: 'relative', padding: 6, borderRadius: 16,
         width: 'min(calc(100vw - 32px), calc(100vh - 260px), 380px)',
-        background: 'linear-gradient(160deg, color-mix(in srgb, #14532d 55%, var(--card-solid)), color-mix(in srgb, #052e16 55%, var(--card-solid)))',
-        boxShadow: 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 6px rgba(0,0,0,0.4)',
+        background: 'linear-gradient(160deg, #1e6838, #0c3319)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 6px rgba(0,0,0,0.4)',
       }}>
         <RoughFrame stroke="rgba(255,255,255,0.12)" strokeWidth={1} radius={16} />
         <div style={{
@@ -206,8 +203,8 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                 style={{
                   display: 'grid', placeItems: 'center',
                   background: isValid
-                    ? 'rgba(99,102,241,0.18)'
-                    : 'linear-gradient(160deg, rgba(21,128,61,0.28), rgba(5,46,22,0.22))',
+                    ? 'rgba(99,102,241,0.28)'
+                    : 'linear-gradient(160deg, rgba(30,104,56,0.92), rgba(12,51,25,0.88))',
                   cursor: isValid && isMoveCandidate ? 'pointer' : 'default',
                   transition: 'background .12s',
                   outline: '0.5px solid rgba(0,0,0,0.35)',
@@ -218,8 +215,9 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                 ) : isValid ? (
                   <div style={{
                     width: '28%', height: '28%', borderRadius: '50%',
-                    background: 'var(--accent)', opacity: 0.55,
-                    boxShadow: '0 0 6px var(--accent)',
+                    background: active === 0 ? '#FF3EA5' : '#38BDF8',
+                    opacity: 0.75,
+                    boxShadow: `0 0 8px ${active === 0 ? '#FF3EA5' : '#38BDF8'}`,
                   }} />
                 ) : null}
               </div>
