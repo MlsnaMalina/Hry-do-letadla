@@ -121,9 +121,9 @@ export function Tecky({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
     <GameShell players={players} active={active} winner={typeof winner==='number'?winner:null}
       scores={[{value:scores[0],color:players[0].color},{value:scores[1],color:players[1].color}]}
       turnStyle={turnStyle} onBack={onBack} onRestart={restart} onPause={()=>setPaused(p=>!p)} paused={paused} onRules={()=>setRules(true)}>
-      <div style={{position:'relative',padding:14,borderRadius:18,background:'var(--card-bg)',backdropFilter:'blur(12px)',boxShadow:'var(--glass-shadow)',overflow:'auto',maxWidth:'100%'}}>
+      <div style={{position:'relative',padding:10,borderRadius:18,width:'min(calc(100vw - 32px), 380px)',background:'var(--card-bg)',backdropFilter:'blur(12px)',boxShadow:'var(--glass-shadow)'}}>
         <RoughFrame stroke="var(--border-strong)" strokeWidth={1} radius={18} />
-        <svg width={W+22} height={H+22} viewBox={`-11 -11 ${W+22} ${H+22}`} style={{display:'block',overflow:'visible'}}>
+        <svg viewBox={`-11 -11 ${W+22} ${H+22}`} style={{display:'block',overflow:'visible',width:'100%',height:'auto'}}>
           {Array.from({length:C},(_,c)=><line key={'vl'+c} x1={X(c)} y1={0} x2={X(c)} y2={H} stroke="var(--border)" strokeWidth="1"/>)}
           {Array.from({length:R},(_,r)=><line key={'hl'+r} x1={0} y1={Y(r)} x2={W} y2={Y(r)} stroke="var(--border)" strokeWidth="1"/>)}
           {dots.map((_,i)=>{const own=terr[i]!=null?terr[i]:cap[i]; if(own==null) return null; const r=Math.floor(i/C),c=i%C; return <rect key={'tt'+i} x={X(c)-GAP/2} y={Y(r)-GAP/2} width={GAP} height={GAP} fill={pcol(own)} fillOpacity="0.18"/>})}

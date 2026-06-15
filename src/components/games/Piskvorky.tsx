@@ -12,9 +12,9 @@ function mkPlayers(mode: GameMode): Player[] {
 }
 
 function Mark({ kind, color, win }: { kind: number; color: string; win: boolean }) {
-  const s = { fill: 'none', stroke: color, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, filter: `drop-shadow(0 0 5px ${color})` }
-  if (kind === 0) return <svg width="22" height="22" viewBox="0 0 24 24" style={s} className={win ? 'pop-in' : ''}><path strokeWidth="3.4" d="M6 6L18 18M18 6L6 18" /></svg>
-  return <svg width="22" height="22" viewBox="0 0 24 24" style={s} className={win ? 'pop-in' : ''}><circle strokeWidth="3.4" cx="12" cy="12" r="7" /></svg>
+  const s = { fill: 'none', stroke: color, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, filter: `drop-shadow(0 0 5px ${color})`, width: '68%', height: '68%' }
+  if (kind === 0) return <svg viewBox="0 0 24 24" style={s} className={win ? 'pop-in' : ''}><path strokeWidth="3.4" d="M6 6L18 18M18 6L6 18" /></svg>
+  return <svg viewBox="0 0 24 24" style={s} className={win ? 'pop-in' : ''}><circle strokeWidth="3.4" cx="12" cy="12" r="7" /></svg>
 }
 
 function check(b: (number | null)[], idx: number, p: number): number[] | null {
@@ -161,14 +161,14 @@ export function Piskvorky({ game, mode, turnStyle, onBack, onBestUpdate }: Props
     <GameShell players={players} active={active} winner={typeof winner === 'number' ? winner : null}
       scores={[{ value: scores[0], color: players[0].color }, { value: scores[1], color: players[1].color }]}
       turnStyle={turnStyle} onBack={onBack} onRestart={restart} onPause={() => setPaused(p => !p)} paused={paused} onRules={() => setRules(true)}>
-      <div style={{ position: 'relative', padding: 10, borderRadius: 16, background: 'linear-gradient(165deg, color-mix(in srgb, var(--accent) 10%, var(--card-solid)), var(--card-solid))', boxShadow: 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.12)' }}>
+      <div style={{ position: 'relative', padding: 8, borderRadius: 16, width: 'min(calc(100vw - 32px), 380px)', background: 'linear-gradient(165deg, color-mix(in srgb, var(--accent) 10%, var(--card-solid)), var(--card-solid))', boxShadow: 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.12)' }}>
         <RoughFrame stroke="var(--border-strong)" strokeWidth={1} radius={16} />
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${N}, 30px)`, gridTemplateRows: `repeat(${N}, 30px)`, borderRadius: 8, overflow: 'hidden', boxShadow: 'inset 0 0 14px rgba(0,0,0,0.2)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${N}, 1fr)`, aspectRatio: '1', borderRadius: 8, overflow: 'hidden', boxShadow: 'inset 0 0 14px rgba(0,0,0,0.2)' }}>
           {board.map((v, i) => {
             const isWin = winCells.includes(i), isEmpty = v == null && winner == null
             return (
               <button key={i} onClick={() => place(i)} className={`${isEmpty ? 'ttt-cell' : ''} ${isWin ? 'win-flash' : ''}`}
-                style={{ width: 30, height: 30, border: '0.5px solid var(--border)', background: isWin ? 'var(--accent-tint-strong)' : 'transparent', display: 'grid', placeItems: 'center', cursor: isEmpty ? 'pointer' : 'default', padding: 0, transition: 'background .15s' }}>
+                style={{ aspectRatio: '1', border: '0.5px solid var(--border)', background: isWin ? 'var(--accent-tint-strong)' : 'transparent', display: 'grid', placeItems: 'center', cursor: isEmpty ? 'pointer' : 'default', padding: 0, transition: 'background .15s' }}>
                 {v != null && <Mark kind={v} color={players[v].color} win={isWin} />}
               </button>
             )

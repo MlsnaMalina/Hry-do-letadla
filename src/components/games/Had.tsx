@@ -131,11 +131,13 @@ export function Had({ game, onBack, onBestUpdate }: Props) {
     <button
       onPointerDown={e => { e.preventDefault(); changeDir(dir) }}
       style={{
-        width: CELL * 3, height: CELL * 3, borderRadius: 12, border: 'none', cursor: 'pointer',
-        background: 'var(--card-solid)', color: 'var(--text)', fontSize: CELL * 1.1,
+        width: 62, height: 62, borderRadius: 18, border: 'none', cursor: 'pointer',
+        background: 'linear-gradient(145deg, color-mix(in srgb, #FF3EA5 30%, var(--card-solid)), color-mix(in srgb, #FF3EA5 12%, var(--card-solid)))',
+        color: '#FF79C6', fontSize: 28,
         display: 'grid', placeItems: 'center',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1)',
+        boxShadow: '0 4px 18px rgba(255,62,165,0.35), inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 0 rgba(0,0,0,0.4)',
         WebkitUserSelect: 'none', userSelect: 'none', touchAction: 'none',
+        lineHeight: 1,
       }}
     >{label}</button>
   )
@@ -211,16 +213,16 @@ export function Had({ game, onBack, onBestUpdate }: Props) {
       </svg>
 
       {/* D-pad */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, marginTop: 10 }}>
-        <DBtn dir="up" label="↑" />
-        <div style={{ display: 'flex', gap: 4 }}>
-          <DBtn dir="left" label="←" />
-          <div style={{ width: CELL * 3, height: CELL * 3, borderRadius: 12, background: 'var(--card-bg)', display: 'grid', placeItems: 'center' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 11, color: 'var(--text-muted)' }}>{gs.score}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 12 }}>
+        <DBtn dir="up" label="▲" />
+        <div style={{ display: 'flex', gap: 6 }}>
+          <DBtn dir="left" label="◀" />
+          <div style={{ width: 62, height: 62, borderRadius: 18, background: 'var(--card-bg)', display: 'grid', placeItems: 'center', border: '1px solid rgba(255,62,165,0.2)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 18, color: '#FF79C6' }}>{gs.score}</span>
           </div>
-          <DBtn dir="right" label="→" />
+          <DBtn dir="right" label="▶" />
         </div>
-        <DBtn dir="down" label="↓" />
+        <DBtn dir="down" label="▼" />
       </div>
 
       <ResultsModal

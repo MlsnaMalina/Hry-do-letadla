@@ -3,7 +3,7 @@ import { GameShell, ResultsModal, RulesSheet, type Player } from '../shell/GameS
 import { RoughFrame } from '../primitives/RoughFrame'
 import type { GameDef, GameMode } from '../../data/games'
 
-const COLS = 7, ROWS = 6, S = 40
+const COLS = 7, ROWS = 6
 
 function mkPlayers(mode: GameMode): Player[] {
   return mode === 'ai'
@@ -90,17 +90,17 @@ export function Ctyri({ game, mode, turnStyle, onBack, onBestUpdate }: Props) {
     <GameShell players={players} active={active} winner={typeof winner==='number'?winner:null}
       scores={[{value:scores[0],color:players[0].color},{value:scores[1],color:players[1].color}]}
       turnStyle={turnStyle} onBack={onBack} onRestart={restart} onPause={()=>setPaused(p=>!p)} paused={paused} onRules={()=>setRules(true)}>
-      <div style={{position:'relative',padding:11,background:'linear-gradient(165deg, color-mix(in srgb, var(--accent) 26%, var(--card-solid)), color-mix(in srgb, var(--accent) 8%, var(--card-solid)))',borderRadius:18,boxShadow:'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -3px 8px rgba(0,0,0,0.28)'}}>
+      <div style={{position:'relative',padding:10,width:'min(calc(100vw - 32px), 380px)',background:'linear-gradient(165deg, color-mix(in srgb, var(--accent) 26%, var(--card-solid)), color-mix(in srgb, var(--accent) 8%, var(--card-solid)))',borderRadius:18,boxShadow:'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -3px 8px rgba(0,0,0,0.28)'}}>
         <RoughFrame stroke="var(--accent)" strokeWidth={1.5} radius={18} glow="var(--accent-tint-strong)"/>
-        <div style={{display:'grid',gridTemplateColumns:`repeat(${COLS}, ${S}px)`}}>
+        <div style={{display:'grid',gridTemplateColumns:`repeat(${COLS}, 1fr)`,gridTemplateRows:`repeat(${ROWS}, 1fr)`,aspectRatio:`${COLS}/${ROWS}`}}>
           {board.map((val,i)=>{
             const c=i%COLS, isWin=winCells.includes(i)
             const col=val!=null?players[val].color:null
             return (
-              <div key={i} onClick={()=>drop(c)} style={{width:S,height:S,display:'grid',placeItems:'center',cursor:winner==null?'pointer':'default'}}>
-                <div style={{width:S-9,height:S-9,borderRadius:999,position:'relative',background:'radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--bg) 82%, #000), var(--bg))',boxShadow:'inset 0 2px 5px rgba(0,0,0,0.55), inset 0 -1px 2px rgba(255,255,255,0.07), inset 0 0 0 1px var(--border)',overflow:'hidden'}}>
+              <div key={i} onClick={()=>drop(c)} style={{aspectRatio:'1',display:'grid',placeItems:'center',cursor:winner==null?'pointer':'default'}}>
+                <div style={{width:'82%',height:'82%',borderRadius:999,position:'relative',background:'radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--bg) 82%, #000), var(--bg))',boxShadow:'inset 0 2px 5px rgba(0,0,0,0.55), inset 0 -1px 2px rgba(255,255,255,0.07), inset 0 0 0 1px var(--border)',overflow:'hidden'}}>
                   {val!=null&&(
-                    <div className={dropping===i?'drop-in':(isWin?'pulse':'')} style={{position:'absolute',inset:3,borderRadius:999,background:`radial-gradient(circle at 36% 28%, color-mix(in srgb, ${col} 45%, #fff), ${col} 56%, color-mix(in srgb, ${col} 62%, #000) 100%)`,boxShadow:isWin?`inset 0 1px 2px rgba(255,255,255,0.5), inset 0 -2px 4px rgba(0,0,0,0.35), 0 0 0 2px var(--bg), 0 0 0 4px ${col}, 0 0 18px ${col}`:`inset 0 1.5px 2px rgba(255,255,255,0.5), inset 0 -2px 5px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.45), 0 0 9px ${col}`}}/>
+                    <div className={dropping===i?'drop-in':(isWin?'pulse':'')} style={{position:'absolute',inset:'10%',borderRadius:999,background:`radial-gradient(circle at 36% 28%, color-mix(in srgb, ${col} 45%, #fff), ${col} 56%, color-mix(in srgb, ${col} 62%, #000) 100%)`,boxShadow:isWin?`inset 0 1px 2px rgba(255,255,255,0.5), inset 0 -2px 4px rgba(0,0,0,0.35), 0 0 0 2px var(--bg), 0 0 0 4px ${col}, 0 0 18px ${col}`:`inset 0 1.5px 2px rgba(255,255,255,0.5), inset 0 -2px 5px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.45), 0 0 9px ${col}`}}/>
                   )}
                 </div>
               </div>
