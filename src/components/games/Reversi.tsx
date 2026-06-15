@@ -180,16 +180,16 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
       <div style={{
         position: 'relative', padding: 6, borderRadius: 16,
         width: 'min(calc(100vw - 32px), calc(100vh - 260px), 380px)',
-        background: 'linear-gradient(160deg, #1e6838, #0c3319)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 6px rgba(0,0,0,0.4)',
+        background: 'linear-gradient(160deg, color-mix(in srgb, var(--accent) 22%, var(--card-solid)), color-mix(in srgb, var(--accent) 7%, var(--card-solid)))',
+        boxShadow: 'var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -2px 6px rgba(0,0,0,0.2)',
       }}>
-        <RoughFrame stroke="rgba(255,255,255,0.12)" strokeWidth={1} radius={16} />
+        <RoughFrame stroke="var(--accent)" strokeWidth={1.5} radius={16} glow="var(--accent-tint-strong)" />
         <div style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
           aspectRatio: '1',
-          gap: 1, background: 'rgba(0,0,0,0.35)', borderRadius: 10,
-          boxShadow: 'inset 0 0 12px rgba(0,0,0,0.4)',
+          gap: 1, background: 'color-mix(in srgb, var(--accent) 14%, var(--card-solid))', borderRadius: 10,
+          boxShadow: 'inset 0 0 12px rgba(0,0,0,0.15)',
           overflow: 'hidden',
         }}>
           {board.map((val, i) => {
@@ -203,11 +203,11 @@ export function Reversi({ game, mode, turnStyle, onBack, onBestUpdate }: Props) 
                 style={{
                   display: 'grid', placeItems: 'center',
                   background: isValid
-                    ? 'rgba(99,102,241,0.28)'
-                    : 'linear-gradient(160deg, rgba(30,104,56,0.92), rgba(12,51,25,0.88))',
+                    ? 'var(--accent-tint-soft)'
+                    : 'color-mix(in srgb, var(--accent) 6%, var(--card-bg))',
                   cursor: isValid && isMoveCandidate ? 'pointer' : 'default',
                   transition: 'background .12s',
-                  outline: '0.5px solid rgba(0,0,0,0.35)',
+                  outline: '0.5px solid var(--border)',
                 }}
               >
                 {val != null ? (
